@@ -1,5 +1,7 @@
 import type React from "react"
 
+import { FinancialAssistant } from "@/components/ai/financial-assistant"
+import { BottomTabs } from "@/components/layout/bottom-tabs"
 import { Header } from "@/components/layout/header"
 import { Sidebar } from "@/components/layout/sidebar"
 import { getSupabaseServerClient } from "@/lib/supabase/server"
@@ -44,14 +46,16 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex min-h-screen flex-col bg-gradient-to-br from-background via-background/95 to-background/90">
       <div className="flex flex-1">
         <Sidebar />
         <div className="flex flex-1 flex-col">
           <Header notifications={notifications} isAuthenticated={isAuthenticated} />
-          <main className="flex-1 p-4 md:p-6">{children}</main>
+          <main className="flex-1 p-4 pb-20 md:p-6 md:pb-6">{children}</main>
         </div>
       </div>
+      <BottomTabs />
+      <FinancialAssistant />
     </div>
   )
 }

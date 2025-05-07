@@ -3,13 +3,12 @@
 import { useState } from "react"
 import Link from "next/link"
 import { motion } from "framer-motion"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader } from "@/components/ui/card"
 import { LoginForm } from "@/components/auth/login-form"
 import { RegisterForm } from "@/components/auth/register-form"
 
 export default function LoginPage() {
-  const [activeTab, setActiveTab] = useState("login")
+  const [activeTab, setActiveTab] = useState<"login" | "register">("login")
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-primary/20 via-background to-primary/10 p-4">
@@ -27,22 +26,37 @@ export default function LoginPage() {
 
       <Card className="w-full max-w-md glassmorphism">
         <CardHeader>
-          <Tabs defaultValue="login" value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="login">Sign In</TabsTrigger>
-              <TabsTrigger value="register">Sign Up</TabsTrigger>
-            </TabsList>
-          </Tabs>
+          <div className="flex w-full space-x-1 rounded-md bg-muted p-1">
+            <button
+              onClick={() => setActiveTab("login")}
+              className={`flex-1 rounded-sm px-3 py-2 text-sm font-medium ${
+                activeTab === "login" ? "bg-background shadow" : "text-muted-foreground"
+              }`}
+            >
+              Sign In
+            </button>
+            <button
+              onClick={() => setActiveTab("register")}
+              className={`flex-1 rounded-sm px-3 py-2 text-sm font-medium ${
+                activeTab === "register" ? "bg-background shadow" : "text-muted-foreground"
+              }`}
+            >
+              Sign Up
+            </button>
+          </div>
         </CardHeader>
         <CardContent>
-          <TabsContent value="login" className="mt-0">
-            <CardDescription className="mb-4 text-center">Sign in to your account</CardDescription>
-            <LoginForm />
-          </TabsContent>
-          <TabsContent value="register" className="mt-0">
-            <CardDescription className="mb-4 text-center">Create a new account</CardDescription>
-            <RegisterForm />
-          </TabsContent>
+          {activeTab === "login" ? (
+            <>
+              <CardDescription className="mb-4 text-center">Sign in to your account</CardDescription>
+              <LoginForm />
+            </>
+          ) : (
+            <>
+              <CardDescription className="mb-4 text-center">Create a new account</CardDescription>
+              <RegisterForm />
+            </>
+          )}
         </CardContent>
         <CardFooter className="flex flex-col space-y-4">
           <div className="text-center text-sm text-muted-foreground">

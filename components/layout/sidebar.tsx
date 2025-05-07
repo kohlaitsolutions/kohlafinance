@@ -4,7 +4,7 @@ import { useState } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { motion } from "framer-motion"
-import { BarChart, CreditCard, Home, LogOut, Menu, Settings, User, Wallet, X } from "lucide-react"
+import { BarChart, CreditCard, Home, LogOut, Menu, Settings, Share, TrendingUp, User, Wallet, X } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { getSupabaseBrowserClient } from "@/lib/supabase/client"
@@ -32,6 +32,16 @@ const sidebarItems = [
     icon: BarChart,
   },
   {
+    title: "Invest",
+    href: "/invest",
+    icon: TrendingUp,
+  },
+  {
+    title: "Refer",
+    href: "/refer",
+    icon: Share,
+  },
+  {
     title: "Account",
     href: "/account",
     icon: User,
@@ -57,25 +67,19 @@ export function Sidebar() {
 
   return (
     <>
-      <Button
-        variant="ghost"
-        size="icon"
-        className="fixed left-4 top-4 z-50 md:hidden"
-        onClick={() => setIsOpen(!isOpen)}
-      >
-        {isOpen ? <X /> : <Menu />}
-      </Button>
-
       <motion.aside
         initial={{ x: -300 }}
         animate={{ x: isOpen ? 0 : -300 }}
         transition={{ duration: 0.3, ease: "easeInOut" }}
         className="fixed inset-y-0 left-0 z-40 flex w-64 flex-col bg-background shadow-lg md:static md:translate-x-0"
       >
-        <div className="flex h-16 items-center justify-center border-b px-6">
+        <div className="flex h-16 items-center justify-between border-b px-6">
           <Link href="/dashboard" className="flex items-center gap-2">
             <span className="text-xl font-bold text-primary">Kohlawise</span>
           </Link>
+          <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setIsOpen(false)}>
+            <X className="h-4 w-4" />
+          </Button>
         </div>
 
         <nav className="flex-1 space-y-1 p-4">
@@ -85,7 +89,9 @@ export function Sidebar() {
               href={item.href}
               className={cn(
                 "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
-                pathname === item.href ? "bg-primary text-primary-foreground" : "hover:bg-muted",
+                pathname === item.href || pathname.startsWith(`${item.href}/`)
+                  ? "bg-primary text-primary-foreground"
+                  : "hover:bg-muted",
               )}
             >
               <item.icon className="h-4 w-4" />
@@ -101,6 +107,13 @@ export function Sidebar() {
           </Button>
         </div>
       </motion.aside>
+
+      {/* Menu toggle button positioned below the logo */}
+      <div className="fixed left-0 top-16 z-50 p-4 md:hidden">
+        <Button variant="outline" size="icon" className="rounded-full shadow-md" onClick={() => setIsOpen(!isOpen)}>
+          <Menu className="h-4 w-4" />
+        </Button>
+      </div>
     </>
   )
 }

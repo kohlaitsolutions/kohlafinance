@@ -41,7 +41,7 @@ export function QuickActions() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: index * 0.1 }}
           >
-            <Link href={action.href}>
+            <Link href={action.href} className="block h-full">
               <Card className="h-full transition-colors hover:bg-muted/50 card-hover">
                 <CardContent className="flex flex-col items-center justify-center p-6 text-center">
                   <action.icon className="mb-4 h-8 w-8 text-primary" />

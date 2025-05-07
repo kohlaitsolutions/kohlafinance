@@ -1,10 +1,12 @@
 "use client"
 
-import { useState } from "react"
+import type React from "react"
+
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { motion } from "framer-motion"
-import { Bell, LogIn, LogOut, Search, User } from "lucide-react"
+import { motion, AnimatePresence } from "framer-motion"
+import { Bell, CreditCard, Home, LogIn, LogOut, Search, Settings, TrendingUp, User, Wallet, X } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -24,8 +26,17 @@ type HeaderProps = {
   isAuthenticated?: boolean
 }
 
+type SearchResult = {
+  title: string
+  description: string
+  icon: React.ElementType
+  href: string
+}
+
 export function Header({ notifications, isAuthenticated = false }: HeaderProps) {
   const [isSearchOpen, setIsSearchOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState("")
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([])
   const router = useRouter()
   const supabase = getSupabaseBrowserClient()
 
@@ -37,6 +48,74 @@ export function Header({ notifications, isAuthenticated = false }: HeaderProps) 
     router.refresh()
   }
 
+  // Search functionality
+  useEffect(() => {
+    if (searchQuery.length > 1) {
+      // Define search results based on the query
+      const allResults: SearchResult[] = [
+        {
+          title: "Dashboard",
+          description: "View your financial overview",
+          icon: Home,
+          href: "/dashboard",
+        },
+        {
+          title: "Transactions",
+          description: "View your transaction history",
+          icon: Wallet,
+          href: "/transactions",
+        },
+        {
+          title: "Send Money",
+          description: "Transfer funds to another account",
+          icon: Wallet,
+          href: "/payments/send",
+        },
+        {
+          title: "Add Money",
+          description: "Deposit funds to your account",
+          icon: Wallet,
+          href: "/payments/deposit",
+        },
+        {
+          title: "Pay Bills",
+          description: "Pay your monthly bills",
+          icon: CreditCard,
+          href: "/payments/bills",
+        },
+        {
+          title: "Investments",
+          description: "Manage your investment portfolio",
+          icon: TrendingUp,
+          href: "/invest",
+        },
+        {
+          title: "Account Settings",
+          description: "Manage your profile information",
+          icon: User,
+          href: "/account",
+        },
+        {
+          title: "App Settings",
+          description: "Customize application preferences",
+          icon: Settings,
+          href: "/settings",
+        },
+      ]
+
+      // Filter results based on search query
+      const filteredResults = allResults.filter(
+        (result) =>
+          result.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          result.description.toLowerCase().includes(searchQuery.toLowerCase()),
+      )
+
+      setSearchResults(filteredResults)
+    } else {
+      setSearchResults([])
+    }
+  }, [searchQuery])
+
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background/95 px-4 backdrop-blur md:px-6">
       <div className="flex items-center gap-2 md:hidden">
@@ -46,25 +125,57 @@ export function Header({ notifications, isAuthenticated = false }: HeaderProps) 
       </div>
 
       <div className="flex flex-1 items-center justify-end gap-4 md:justify-between">
-        <motion.div
-          initial={false}
-          animate={{ width: isSearchOpen ? "auto" : "0px" }}
-          className="hidden overflow-hidden md:flex"
-        >
-          {isSearchOpen && (
-            <div className="relative">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input type="search" placeholder="Search..." className="w-[200px] pl-8" />
-            </div>
-          )}
-        </motion.div>
+        <div className="relative md:w-full md:max-w-sm">
+          <div className="relative">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              type="search"
+              placeholder="Search..."
+              className="w-full pl-8 md:w-[300px]"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onFocus={() => setIsSearchOpen(true)}
+            />
+            {searchQuery && (
+              <Button variant="ghost" size="icon" className="absolute right-0 top-0" onClick={() => setSearchQuery("")}>
+                <X className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
+
+          <AnimatePresence>
+            {isSearchOpen && searchResults.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="absolute left-0 right-0 top-full z-50 mt-1 overflow-hidden rounded-md border bg-background shadow-md"
+              >
+                <div className="max-h-[300px] overflow-y-auto p-2">
+                  {searchResults.map((result, index) => (
+                    <Link
+                      key={index}
+                      href={result.href}
+                      className="flex items-center gap-3 rounded-md px-3 py-2 hover:bg-muted"
+                      onClick={() => {
+                        setIsSearchOpen(false)
+                        setSearchQuery("")
+                      }}
+                    >
+                      <result.icon className="h-4 w-4 text-primary" />
+                      <div>
+                        <div className="font-medium">{result.title}</div>
+                        <div className="text-xs text-muted-foreground">{result.description}</div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
 
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" onClick={() => setIsSearchOpen(!isSearchOpen)} className="hidden md:flex">
-            <Search className="h-4 w-4" />
-            <span className="sr-only">Search</span>
-          </Button>
-
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="relative">

@@ -1,7 +1,8 @@
 import { getSupabaseServerClient } from "@/lib/supabase/server"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { formatCurrency, formatDate } from "@/lib/utils"
+import { ArrowDownLeft, ArrowUpRight, MoreVertical } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
 export default async function TransactionsPage() {
   const supabase = getSupabaseServerClient()
@@ -82,7 +83,51 @@ export default async function TransactionsPage() {
         category: "income",
         created_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
       },
+      {
+        id: "demo-tx-4",
+        account_id: "demo-1",
+        transaction_type: "payment",
+        amount: 89.99,
+        description: "Phone Bill",
+        recipient_name: "Verizon",
+        recipient_account: "1122334455",
+        status: "completed",
+        category: "utilities",
+        created_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
+      },
+      {
+        id: "demo-tx-5",
+        account_id: "demo-1",
+        transaction_type: "payment",
+        amount: 35.75,
+        description: "Dinner",
+        recipient_name: "Olive Garden",
+        recipient_account: "5566778899",
+        status: "completed",
+        category: "dining",
+        created_at: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000).toISOString(),
+      },
     ]
+  }
+
+  // Function to get category color
+  const getCategoryColor = (category: string | null) => {
+    if (!category) return "bg-gray-100"
+
+    switch (category.toLowerCase()) {
+      case "entertainment":
+        return "bg-purple-100"
+      case "groceries":
+        return "bg-blue-100"
+      case "utilities":
+        return "bg-yellow-100"
+      case "dining":
+        return "bg-orange-100"
+      case "income":
+        return "bg-primary/10"
+      default:
+        return "bg-gray-100"
+    }
   }
 
   return (
@@ -92,44 +137,67 @@ export default async function TransactionsPage() {
         <p className="text-muted-foreground">View all your transaction history</p>
       </div>
 
-      <Card>
-        <CardHeader>
+      <Card className="border-0 shadow-md">
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Transaction History</CardTitle>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm">
+              Filter
+            </Button>
+            <Button variant="outline" size="sm">
+              Export
+            </Button>
+          </div>
         </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Date</TableHead>
-                <TableHead>Description</TableHead>
-                <TableHead>Recipient</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead className="text-right">Amount</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {transactions.map((transaction) => (
-                <TableRow key={transaction.id}>
-                  <TableCell>{formatDate(transaction.created_at)}</TableCell>
-                  <TableCell>
-                    {transaction.description || (transaction.transaction_type === "deposit" ? "Deposit" : "Payment")}
-                  </TableCell>
-                  <TableCell>{transaction.recipient_name || "-"}</TableCell>
-                  <TableCell className="capitalize">{transaction.transaction_type}</TableCell>
-                  <TableCell
+        <CardContent className="p-0">
+          <div className="space-y-1">
+            {transactions.map((transaction) => (
+              <div
+                key={transaction.id}
+                className="flex items-center justify-between border-b p-4 last:border-0 hover:bg-muted/50 transition-colors"
+              >
+                <div className="flex items-center gap-4">
+                  <div
+                    className={`flex h-10 w-10 items-center justify-center rounded-full ${getCategoryColor(transaction.category)}`}
+                  >
+                    {transaction.transaction_type === "deposit" ? (
+                      <ArrowDownLeft className="h-5 w-5 text-primary" />
+                    ) : (
+                      <ArrowUpRight className="h-5 w-5 text-red-500" />
+                    )}
+                  </div>
+                  <div>
+                    <div className="font-medium">
+                      {transaction.description ||
+                        (transaction.transaction_type === "deposit"
+                          ? "Deposit"
+                          : transaction.recipient_name || "Payment")}
+                    </div>
+                    <div className="text-sm text-muted-foreground">{formatDate(transaction.created_at)}</div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div
                     className={
                       transaction.transaction_type === "deposit"
-                        ? "text-right text-green-500"
-                        : "text-right text-red-500"
+                        ? "text-primary font-medium"
+                        : "text-red-500 font-medium"
                     }
                   >
                     {transaction.transaction_type === "deposit" ? "+" : "-"}
                     {formatCurrency(transaction.amount)}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+                  </div>
+                  <Button variant="ghost" size="icon">
+                    <MoreVertical className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            ))}
+
+            {transactions.length === 0 && (
+              <div className="p-4 text-center text-sm text-muted-foreground">No transactions found</div>
+            )}
+          </div>
         </CardContent>
       </Card>
     </div>

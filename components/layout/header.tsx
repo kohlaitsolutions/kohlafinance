@@ -133,7 +133,7 @@ export function Header({ notifications, isAuthenticated = false }: HeaderProps) 
   }, [searchQuery])
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background px-4 shadow-sm md:px-6">
+    <header className="sticky top-0 z-30 flex h-16 items-center justify-between bg-background px-4 shadow-sm md:px-6">
       <div className="flex items-center gap-2 md:hidden">
         <Link href="/dashboard" className="flex items-center gap-2">
           <span className="text-xl font-bold text-primary">Kohlawise</span>

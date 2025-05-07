@@ -47,12 +47,10 @@ export default async function DashboardLayout({
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
+      <Header notifications={notifications} isAuthenticated={isAuthenticated} />
       <div className="flex flex-1">
         <Sidebar />
-        <div className="flex flex-1 flex-col">
-          <Header notifications={notifications} isAuthenticated={isAuthenticated} />
-          <main className="flex-1 p-4 pb-20 md:p-6 md:pb-6">{children}</main>
-        </div>
+        <main className="flex-1 p-4 pb-20 md:p-6 md:pb-6">{children}</main>
       </div>
       <BottomTabs />
       <FinancialAssistant />

@@ -10,6 +10,8 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { CryptoPortfolio } from "@/components/invest/crypto-portfolio"
+import { CryptoPriceAlert } from "@/components/invest/crypto-price-alert"
+import { CryptoConverter } from "@/components/invest/crypto-converter"
 import { formatCurrency } from "@/lib/utils"
 import {
   fetchCryptocurrencies,
@@ -113,7 +115,7 @@ export default function InvestPage() {
           transition={{ duration: 0.3, delay: 0.1 }}
         >
           <Card className="border-0 shadow-md overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-primary to-pink-600 opacity-90" />
+            <div className="absolute inset-0 bg-gradient-to-br from-primary to-teal-600 opacity-90" />
             <CardHeader className="pb-2 relative text-white">
               <CardTitle className="text-lg">Cryptocurrencies</CardTitle>
               <CardDescription className="text-white/80">Digital assets</CardDescription>
@@ -171,11 +173,13 @@ export default function InvestPage() {
       </div>
 
       <Tabs value={activeTab} onValueChange={handleTabChange}>
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="portfolio">Portfolio</TabsTrigger>
           <TabsTrigger value="stocks">Stocks</TabsTrigger>
           <TabsTrigger value="crypto">Crypto</TabsTrigger>
           <TabsTrigger value="etfs">ETFs</TabsTrigger>
+          <TabsTrigger value="alerts">Alerts</TabsTrigger>
+          <TabsTrigger value="converter">Converter</TabsTrigger>
         </TabsList>
 
         <TabsContent value="portfolio" className="mt-6">
@@ -320,6 +324,14 @@ export default function InvestPage() {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="alerts" className="mt-6">
+          <CryptoPriceAlert cryptoList={cryptoData} />
+        </TabsContent>
+
+        <TabsContent value="converter" className="mt-6">
+          <CryptoConverter cryptoList={cryptoData} />
         </TabsContent>
       </Tabs>
     </div>

@@ -1,13 +1,20 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useSearchParams } from "next/navigation"
 import { motion } from "framer-motion"
-import { ArrowUpRight, Bitcoin, DollarSign, LineChart, TrendingUp } from "lucide-react"
+import { ArrowUpRight, Bitcoin, DollarSign, LineChart, Loader2, RefreshCw, TrendingUp } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { formatCurrency } from "@/lib/utils"
+import {
+  fetchCryptocurrencies,
+  formatCryptoPrice,
+  formatMarketCap,
+  type CryptoTicker,
+} from "@/lib/services/crypto-service"
 
 const stocksData = [
   { name: "Apple Inc.", symbol: "AAPL", price: 182.63, change: 1.25, changePercent: 0.69 },
@@ -15,14 +22,6 @@ const stocksData = [
   { name: "Amazon.com Inc.", symbol: "AMZN", price: 178.75, change: -0.89, changePercent: -0.5 },
   { name: "Alphabet Inc.", symbol: "GOOGL", price: 131.86, change: 1.12, changePercent: 0.86 },
   { name: "Tesla Inc.", symbol: "TSLA", price: 237.49, change: 5.23, changePercent: 2.25 },
-]
-
-const cryptoData = [
-  { name: "Bitcoin", symbol: "BTC", price: 43250.75, change: 1250.25, changePercent: 2.98 },
-  { name: "Ethereum", symbol: "ETH", price: 2275.63, change: 87.45, changePercent: 4.0 },
-  { name: "Binance Coin", symbol: "BNB", price: 312.48, change: -5.23, changePercent: -1.65 },
-  { name: "Solana", symbol: "SOL", price: 98.75, change: 3.45, changePercent: 3.62 },
-  { name: "Cardano", symbol: "ADA", price: 0.45, change: 0.02, changePercent: 4.65 },
 ]
 
 const etfData = [
@@ -35,12 +34,43 @@ const etfData = [
 
 export default function InvestPage() {
   const [isLoading, setIsLoading] = useState(false)
-  const [activeTab, setActiveTab] = useState("stocks")
+  const [cryptoData, setCryptoData] = useState<CryptoTicker[]>([])
+  const [isRefreshing, setIsRefreshing] = useState(false)
+  const searchParams = useSearchParams()
+  const activeTab = searchParams.get("tab") || "stocks"
+
+  useEffect(() => {
+    const loadCryptoData = async () => {
+      setIsLoading(true)
+      try {
+        const data = await fetchCryptocurrencies(0, 20)
+        setCryptoData(data)
+      } catch (error) {
+        console.error("Failed to load cryptocurrency data:", error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    loadCryptoData()
+  }, [])
+
+  const refreshCryptoData = async () => {
+    setIsRefreshing(true)
+    try {
+      const data = await fetchCryptocurrencies(0, 20)
+      setCryptoData(data)
+    } catch (error) {
+      console.error("Failed to refresh cryptocurrency data:", error)
+    } finally {
+      setIsRefreshing(false)
+    }
+  }
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Invest</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Invest & Earn</h1>
         <p className="text-muted-foreground">Grow your wealth with smart investments</p>
       </div>
 
@@ -85,9 +115,13 @@ export default function InvestPage() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
                   <Bitcoin className="mr-2 h-5 w-5 text-primary" />
-                  <span className="text-2xl font-bold">+12.5%</span>
+                  <span className="text-2xl font-bold">
+                    {cryptoData.length > 0
+                      ? `${cryptoData[0].percent_change_24h.startsWith("-") ? "" : "+"}${cryptoData[0].percent_change_24h}%`
+                      : "--"}
+                  </span>
                 </div>
-                <span className="text-sm text-muted-foreground">30D Return</span>
+                <span className="text-sm text-muted-foreground">BTC 24h Change</span>
               </div>
             </CardContent>
             <CardFooter>
@@ -133,12 +167,20 @@ export default function InvestPage() {
       </div>
 
       <Card>
-        <CardHeader>
-          <CardTitle>Investment Opportunities</CardTitle>
-          <CardDescription>Explore and invest in various assets</CardDescription>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div>
+            <CardTitle>Investment Opportunities</CardTitle>
+            <CardDescription>Explore and invest in various assets</CardDescription>
+          </div>
+          {activeTab === "crypto" && (
+            <Button variant="outline" size="sm" onClick={refreshCryptoData} disabled={isRefreshing} className="ml-auto">
+              {isRefreshing ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+              <span className="ml-2">Refresh</span>
+            </Button>
+          )}
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="stocks" value={activeTab} onValueChange={setActiveTab}>
+          <Tabs defaultValue={activeTab} value={activeTab}>
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="stocks" id="stocks">
                 Stocks
@@ -181,34 +223,46 @@ export default function InvestPage() {
               </div>
             </TabsContent>
             <TabsContent value="crypto" className="mt-4">
-              <div className="rounded-md border">
-                <div className="grid grid-cols-12 border-b bg-muted/50 p-3 text-sm font-medium">
-                  <div className="col-span-5">Name</div>
-                  <div className="col-span-2 text-right">Price</div>
-                  <div className="col-span-3 text-right">Change</div>
-                  <div className="col-span-2 text-right">Actions</div>
+              {isLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
                 </div>
-                <div className="divide-y">
-                  {cryptoData.map((crypto) => (
-                    <div key={crypto.symbol} className="grid grid-cols-12 items-center p-3">
-                      <div className="col-span-5">
-                        <div className="font-medium">{crypto.name}</div>
-                        <div className="text-sm text-muted-foreground">{crypto.symbol}</div>
+              ) : (
+                <div className="rounded-md border">
+                  <div className="grid grid-cols-12 border-b bg-muted/50 p-3 text-sm font-medium">
+                    <div className="col-span-4">Name</div>
+                    <div className="col-span-2 text-right">Price</div>
+                    <div className="col-span-2 text-right">24h Change</div>
+                    <div className="col-span-2 text-right">Market Cap</div>
+                    <div className="col-span-2 text-right">Actions</div>
+                  </div>
+                  <div className="divide-y">
+                    {cryptoData.map((crypto) => (
+                      <div key={crypto.id} className="grid grid-cols-12 items-center p-3">
+                        <div className="col-span-4">
+                          <div className="font-medium">{crypto.name}</div>
+                          <div className="text-sm text-muted-foreground">{crypto.symbol}</div>
+                        </div>
+                        <div className="col-span-2 text-right font-medium">${formatCryptoPrice(crypto.price_usd)}</div>
+                        <div className="col-span-2 text-right">
+                          <span
+                            className={
+                              Number.parseFloat(crypto.percent_change_24h) >= 0 ? "text-green-500" : "text-red-500"
+                            }
+                          >
+                            {crypto.percent_change_24h.startsWith("-") ? "" : "+"}
+                            {crypto.percent_change_24h}%
+                          </span>
+                        </div>
+                        <div className="col-span-2 text-right text-sm">{formatMarketCap(crypto.market_cap_usd)}</div>
+                        <div className="col-span-2 text-right">
+                          <Button size="sm">Invest</Button>
+                        </div>
                       </div>
-                      <div className="col-span-2 text-right font-medium">{formatCurrency(crypto.price)}</div>
-                      <div className="col-span-3 text-right">
-                        <span className={crypto.change >= 0 ? "text-green-500" : "text-red-500"}>
-                          {crypto.change >= 0 ? "+" : ""}
-                          {crypto.change.toFixed(2)} ({crypto.changePercent.toFixed(2)}%)
-                        </span>
-                      </div>
-                      <div className="col-span-2 text-right">
-                        <Button size="sm">Invest</Button>
-                      </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
             </TabsContent>
             <TabsContent value="etfs" className="mt-4">
               <div className="rounded-md border">

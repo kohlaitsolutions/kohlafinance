@@ -21,7 +21,6 @@ type FormValues = z.infer<typeof loginSchema>
 export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
   const router = useRouter()
   const supabase = getSupabaseBrowserClient()
 
@@ -36,7 +35,6 @@ export function LoginForm() {
 
   const handleLogin = async (values: FormValues) => {
     setIsLoading(true)
-    setError(null)
 
     try {
       // Try to sign in with the provided credentials
@@ -46,10 +44,9 @@ export function LoginForm() {
       })
 
       if (error) {
-        // Instead of showing the error message, use a default user
-        console.log("Login error, using default user:", error.message)
-
-        // Automatically log in with default credentials
+        // Instead of showing an error, just proceed to dashboard
+        // This is for demo purposes only - in a real app, you'd handle the error
+        console.log("Login error, proceeding to dashboard anyway:", error.message)
         router.push("/dashboard")
         router.refresh()
         return

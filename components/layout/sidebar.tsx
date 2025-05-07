@@ -108,8 +108,8 @@ export function Sidebar() {
         </div>
       </motion.aside>
 
-      {/* Menu toggle button positioned below the logo */}
-      <div className="fixed left-0 top-16 z-50 p-4 md:hidden">
+      {/* Menu toggle button positioned below the welcome text */}
+      <div className="fixed left-0 top-24 z-50 p-4 md:hidden">
         <Button variant="outline" size="icon" className="rounded-full shadow-md" onClick={() => setIsOpen(!isOpen)}>
           <Menu className="h-4 w-4" />
         </Button>

@@ -2,57 +2,60 @@
 
 import Link from "next/link"
 import { motion } from "framer-motion"
-import { CreditCard, Plus, Send } from "lucide-react"
-
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { CreditCard, LineChart, Plus, Send } from "lucide-react"
 
 export function QuickActions() {
   const actions = [
     {
-      title: "Send Money",
-      description: "Transfer to another account",
+      title: "Send",
+      description: "Transfer money",
       icon: Send,
       href: "/payments/send",
+      color: "bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-400",
     },
     {
-      title: "Add Money",
-      description: "Deposit to your account",
+      title: "Add",
+      description: "Deposit funds",
       icon: Plus,
       href: "/payments/deposit",
+      color: "bg-green-100 text-green-600 dark:bg-green-900/40 dark:text-green-400",
     },
     {
-      title: "Pay Bills",
-      description: "Pay your monthly bills",
+      title: "Pay",
+      description: "Pay bills",
       icon: CreditCard,
       href: "/payments/bills",
+      color: "bg-purple-100 text-purple-600 dark:bg-purple-900/40 dark:text-purple-400",
+    },
+    {
+      title: "Invest",
+      description: "Grow wealth",
+      icon: LineChart,
+      href: "/invest",
+      color: "bg-amber-100 text-amber-600 dark:bg-amber-900/40 dark:text-amber-400",
     },
   ]
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Quick Actions</CardTitle>
-      </CardHeader>
-      <CardContent className="grid gap-4 sm:grid-cols-3">
-        {actions.map((action, index) => (
-          <motion.div
-            key={action.title}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: index * 0.1 }}
-          >
-            <Link href={action.href} className="block h-full">
-              <Card className="h-full transition-colors hover:bg-muted/50 card-hover">
-                <CardContent className="flex flex-col items-center justify-center p-6 text-center">
-                  <action.icon className="mb-4 h-8 w-8 text-primary" />
-                  <div className="text-lg font-medium">{action.title}</div>
-                  <div className="text-sm text-muted-foreground">{action.description}</div>
-                </CardContent>
-              </Card>
-            </Link>
-          </motion.div>
-        ))}
-      </CardContent>
-    </Card>
+    <div className="grid grid-cols-4 gap-3 sm:gap-4">
+      {actions.map((action, index) => (
+        <motion.div
+          key={action.title}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: index * 0.05 }}
+        >
+          <Link href={action.href} className="block h-full">
+            <div className="flex flex-col items-center rounded-xl p-3 text-center transition-colors hover:bg-muted/50">
+              <div className={`mb-2 flex h-12 w-12 items-center justify-center rounded-full ${action.color}`}>
+                <action.icon className="h-5 w-5" />
+              </div>
+              <div className="text-sm font-medium">{action.title}</div>
+              <div className="text-xs text-muted-foreground">{action.description}</div>
+            </div>
+          </Link>
+        </motion.div>
+      ))}
+    </div>
   )
 }

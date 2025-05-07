@@ -1,13 +1,15 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useSearchParams } from "next/navigation"
+import Link from "next/link"
+import { useSearchParams, useRouter } from "next/navigation"
 import { motion } from "framer-motion"
-import { ArrowUpRight, Bitcoin, DollarSign, LineChart, Loader2, RefreshCw, TrendingUp } from "lucide-react"
+import { ArrowUpRight, Bitcoin, DollarSign, LineChart, Loader2, RefreshCw } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { CryptoPortfolio } from "@/components/invest/crypto-portfolio"
 import { formatCurrency } from "@/lib/utils"
 import {
   fetchCryptocurrencies,
@@ -37,7 +39,8 @@ export default function InvestPage() {
   const [cryptoData, setCryptoData] = useState<CryptoTicker[]>([])
   const [isRefreshing, setIsRefreshing] = useState(false)
   const searchParams = useSearchParams()
-  const activeTab = searchParams.get("tab") || "stocks"
+  const router = useRouter()
+  const activeTab = searchParams.get("tab") || "portfolio"
 
   useEffect(() => {
     const loadCryptoData = async () => {
@@ -67,6 +70,10 @@ export default function InvestPage() {
     }
   }
 
+  const handleTabChange = (value: string) => {
+    router.push(`/invest?tab=${value}`, { scroll: false })
+  }
+
   return (
     <div className="space-y-6">
       <div>
@@ -76,26 +83,25 @@ export default function InvestPage() {
 
       <div className="grid gap-6 md:grid-cols-3">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
-          <Card className="card-hover">
-            <CardHeader className="pb-2">
+          <Card className="border-0 shadow-md overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-blue-600 opacity-90" />
+            <CardHeader className="pb-2 relative text-white">
               <CardTitle className="text-lg">Stocks</CardTitle>
-              <CardDescription>Trade company shares</CardDescription>
+              <CardDescription className="text-white/80">Trade company shares</CardDescription>
             </CardHeader>
-            <CardContent className="pb-2">
+            <CardContent className="pb-2 relative text-white">
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
-                  <LineChart className="mr-2 h-5 w-5 text-primary" />
+                  <LineChart className="mr-2 h-5 w-5" />
                   <span className="text-2xl font-bold">+8.2%</span>
                 </div>
-                <span className="text-sm text-muted-foreground">YTD Return</span>
+                <span className="text-sm text-white/80">YTD Return</span>
               </div>
             </CardContent>
-            <CardFooter>
-              <Button variant="outline" className="w-full" asChild>
-                <a href="#stocks">
-                  View Stocks
-                  <ArrowUpRight className="ml-2 h-4 w-4" />
-                </a>
+            <CardFooter className="relative">
+              <Button variant="secondary" className="w-full" onClick={() => handleTabChange("stocks")}>
+                View Stocks
+                <ArrowUpRight className="ml-2 h-4 w-4" />
               </Button>
             </CardFooter>
           </Card>
@@ -106,30 +112,29 @@ export default function InvestPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.1 }}
         >
-          <Card className="card-hover">
-            <CardHeader className="pb-2">
+          <Card className="border-0 shadow-md overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-primary to-pink-600 opacity-90" />
+            <CardHeader className="pb-2 relative text-white">
               <CardTitle className="text-lg">Cryptocurrencies</CardTitle>
-              <CardDescription>Digital assets</CardDescription>
+              <CardDescription className="text-white/80">Digital assets</CardDescription>
             </CardHeader>
-            <CardContent className="pb-2">
+            <CardContent className="pb-2 relative text-white">
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
-                  <Bitcoin className="mr-2 h-5 w-5 text-primary" />
+                  <Bitcoin className="mr-2 h-5 w-5" />
                   <span className="text-2xl font-bold">
                     {cryptoData.length > 0
                       ? `${cryptoData[0].percent_change_24h.startsWith("-") ? "" : "+"}${cryptoData[0].percent_change_24h}%`
                       : "--"}
                   </span>
                 </div>
-                <span className="text-sm text-muted-foreground">BTC 24h Change</span>
+                <span className="text-sm text-white/80">BTC 24h Change</span>
               </div>
             </CardContent>
-            <CardFooter>
-              <Button variant="outline" className="w-full" asChild>
-                <a href="#crypto">
-                  View Crypto
-                  <ArrowUpRight className="ml-2 h-4 w-4" />
-                </a>
+            <CardFooter className="relative">
+              <Button variant="secondary" className="w-full" onClick={() => handleTabChange("crypto")}>
+                View Crypto
+                <ArrowUpRight className="ml-2 h-4 w-4" />
               </Button>
             </CardFooter>
           </Card>
@@ -140,59 +145,52 @@ export default function InvestPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.2 }}
         >
-          <Card className="card-hover">
-            <CardHeader className="pb-2">
+          <Card className="border-0 shadow-md overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-amber-500 to-orange-600 opacity-90" />
+            <CardHeader className="pb-2 relative text-white">
               <CardTitle className="text-lg">ETFs</CardTitle>
-              <CardDescription>Exchange-traded funds</CardDescription>
+              <CardDescription className="text-white/80">Exchange-traded funds</CardDescription>
             </CardHeader>
-            <CardContent className="pb-2">
+            <CardContent className="pb-2 relative text-white">
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
-                  <DollarSign className="mr-2 h-5 w-5 text-primary" />
+                  <DollarSign className="mr-2 h-5 w-5" />
                   <span className="text-2xl font-bold">+6.7%</span>
                 </div>
-                <span className="text-sm text-muted-foreground">YTD Return</span>
+                <span className="text-sm text-white/80">YTD Return</span>
               </div>
             </CardContent>
-            <CardFooter>
-              <Button variant="outline" className="w-full" asChild>
-                <a href="#etfs">
-                  View ETFs
-                  <ArrowUpRight className="ml-2 h-4 w-4" />
-                </a>
+            <CardFooter className="relative">
+              <Button variant="secondary" className="w-full" onClick={() => handleTabChange("etfs")}>
+                View ETFs
+                <ArrowUpRight className="ml-2 h-4 w-4" />
               </Button>
             </CardFooter>
           </Card>
         </motion.div>
       </div>
 
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <div>
-            <CardTitle>Investment Opportunities</CardTitle>
-            <CardDescription>Explore and invest in various assets</CardDescription>
-          </div>
-          {activeTab === "crypto" && (
-            <Button variant="outline" size="sm" onClick={refreshCryptoData} disabled={isRefreshing} className="ml-auto">
-              {isRefreshing ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
-              <span className="ml-2">Refresh</span>
-            </Button>
-          )}
-        </CardHeader>
-        <CardContent>
-          <Tabs defaultValue={activeTab} value={activeTab}>
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="stocks" id="stocks">
-                Stocks
-              </TabsTrigger>
-              <TabsTrigger value="crypto" id="crypto">
-                Crypto
-              </TabsTrigger>
-              <TabsTrigger value="etfs" id="etfs">
-                ETFs
-              </TabsTrigger>
-            </TabsList>
-            <TabsContent value="stocks" className="mt-4">
+      <Tabs value={activeTab} onValueChange={handleTabChange}>
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="portfolio">Portfolio</TabsTrigger>
+          <TabsTrigger value="stocks">Stocks</TabsTrigger>
+          <TabsTrigger value="crypto">Crypto</TabsTrigger>
+          <TabsTrigger value="etfs">ETFs</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="portfolio" className="mt-6">
+          <CryptoPortfolio />
+        </TabsContent>
+
+        <TabsContent value="stocks" className="mt-6">
+          <Card className="border-0 shadow-md">
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle>Stocks</CardTitle>
+                <CardDescription>Popular stocks to invest in</CardDescription>
+              </div>
+            </CardHeader>
+            <CardContent>
               <div className="rounded-md border">
                 <div className="grid grid-cols-12 border-b bg-muted/50 p-3 text-sm font-medium">
                   <div className="col-span-5">Name</div>
@@ -209,7 +207,7 @@ export default function InvestPage() {
                       </div>
                       <div className="col-span-2 text-right font-medium">{formatCurrency(stock.price)}</div>
                       <div className="col-span-3 text-right">
-                        <span className={stock.change >= 0 ? "text-green-500" : "text-red-500"}>
+                        <span className={stock.change >= 0 ? "text-blue-500" : "text-red-500"}>
                           {stock.change >= 0 ? "+" : ""}
                           {stock.change.toFixed(2)} ({stock.changePercent.toFixed(2)}%)
                         </span>
@@ -221,8 +219,23 @@ export default function InvestPage() {
                   ))}
                 </div>
               </div>
-            </TabsContent>
-            <TabsContent value="crypto" className="mt-4">
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="crypto" className="mt-6">
+          <Card className="border-0 shadow-md">
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle>Cryptocurrencies</CardTitle>
+                <CardDescription>Digital assets to invest in</CardDescription>
+              </div>
+              <Button variant="outline" size="sm" onClick={refreshCryptoData} disabled={isRefreshing}>
+                {isRefreshing ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+                <span className="ml-2">Refresh</span>
+              </Button>
+            </CardHeader>
+            <CardContent>
               {isLoading ? (
                 <div className="flex items-center justify-center py-8">
                   <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -247,7 +260,7 @@ export default function InvestPage() {
                         <div className="col-span-2 text-right">
                           <span
                             className={
-                              Number.parseFloat(crypto.percent_change_24h) >= 0 ? "text-green-500" : "text-red-500"
+                              Number.parseFloat(crypto.percent_change_24h) >= 0 ? "text-blue-500" : "text-red-500"
                             }
                           >
                             {crypto.percent_change_24h.startsWith("-") ? "" : "+"}
@@ -255,16 +268,28 @@ export default function InvestPage() {
                           </span>
                         </div>
                         <div className="col-span-2 text-right text-sm">{formatMarketCap(crypto.market_cap_usd)}</div>
-                        <div className="col-span-2 text-right">
-                          <Button size="sm">Invest</Button>
+                        <div className="col-span-2 text-right flex justify-end gap-2">
+                          <Button size="sm" variant="outline" asChild>
+                            <Link href={`/invest/crypto/${crypto.id}`}>Details</Link>
+                          </Button>
+                          <Button size="sm">Buy</Button>
                         </div>
                       </div>
                     ))}
                   </div>
                 </div>
               )}
-            </TabsContent>
-            <TabsContent value="etfs" className="mt-4">
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="etfs" className="mt-6">
+          <Card className="border-0 shadow-md">
+            <CardHeader>
+              <CardTitle>ETFs</CardTitle>
+              <CardDescription>Exchange-traded funds to invest in</CardDescription>
+            </CardHeader>
+            <CardContent>
               <div className="rounded-md border">
                 <div className="grid grid-cols-12 border-b bg-muted/50 p-3 text-sm font-medium">
                   <div className="col-span-5">Name</div>
@@ -281,7 +306,7 @@ export default function InvestPage() {
                       </div>
                       <div className="col-span-2 text-right font-medium">{formatCurrency(etf.price)}</div>
                       <div className="col-span-3 text-right">
-                        <span className={etf.change >= 0 ? "text-green-500" : "text-red-500"}>
+                        <span className={etf.change >= 0 ? "text-blue-500" : "text-red-500"}>
                           {etf.change >= 0 ? "+" : ""}
                           {etf.change.toFixed(2)} ({etf.changePercent.toFixed(2)}%)
                         </span>
@@ -293,27 +318,10 @@ export default function InvestPage() {
                   ))}
                 </div>
               </div>
-            </TabsContent>
-          </Tabs>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Investment Portfolio</CardTitle>
-          <CardDescription>Track your investment performance</CardDescription>
-        </CardHeader>
-        <CardContent className="flex items-center justify-center p-6">
-          <div className="text-center">
-            <TrendingUp className="mx-auto h-12 w-12 text-muted-foreground" />
-            <h3 className="mt-4 text-lg font-medium">Start Investing</h3>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Your investment portfolio will appear here once you make your first investment.
-            </p>
-            <Button className="mt-4">Make Your First Investment</Button>
-          </div>
-        </CardContent>
-      </Card>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   )
 }

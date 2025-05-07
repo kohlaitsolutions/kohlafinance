@@ -46,7 +46,7 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-gradient-to-br from-background via-background/95 to-background/90">
+    <div className="flex min-h-screen flex-col bg-background">
       <div className="flex flex-1">
         <Sidebar />
         <div className="flex flex-1 flex-col">

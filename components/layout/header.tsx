@@ -6,7 +6,21 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
-import { Bell, CreditCard, Home, LogIn, LogOut, Search, Settings, TrendingUp, User, Wallet, X } from "lucide-react"
+import {
+  Bell,
+  CreditCard,
+  Home,
+  LogIn,
+  LogOut,
+  Moon,
+  Search,
+  Settings,
+  Sun,
+  TrendingUp,
+  User,
+  Wallet,
+  X,
+} from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -19,6 +33,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { getSupabaseBrowserClient } from "@/lib/supabase/client"
+import { useTheme } from "next-themes"
 import type { Notification } from "@/lib/types"
 
 type HeaderProps = {
@@ -39,6 +54,7 @@ export function Header({ notifications, isAuthenticated = false }: HeaderProps) 
   const [searchResults, setSearchResults] = useState<SearchResult[]>([])
   const router = useRouter()
   const supabase = getSupabaseBrowserClient()
+  const { theme, setTheme } = useTheme()
 
   const unreadNotifications = notifications.filter((notification) => !notification.is_read)
 
@@ -117,7 +133,7 @@ export function Header({ notifications, isAuthenticated = false }: HeaderProps) 
   }, [searchQuery])
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background/95 px-4 backdrop-blur md:px-6">
+    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background px-4 shadow-sm md:px-6">
       <div className="flex items-center gap-2 md:hidden">
         <Link href="/dashboard" className="flex items-center gap-2">
           <span className="text-xl font-bold text-primary">Kohlawise</span>
@@ -176,6 +192,15 @@ export function Header({ notifications, isAuthenticated = false }: HeaderProps) 
         </div>
 
         <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            aria-label="Toggle theme"
+          >
+            {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          </Button>
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="relative">

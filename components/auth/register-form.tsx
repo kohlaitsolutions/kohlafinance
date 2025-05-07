@@ -65,6 +65,9 @@ export function RegisterForm() {
           lastName: values.lastName,
         })
 
+        // Store email in localStorage for login convenience
+        localStorage.setItem("kohlawise_email", values.email)
+
         // Sign in the user immediately
         await supabase.auth.signInWithPassword({
           email: values.email,

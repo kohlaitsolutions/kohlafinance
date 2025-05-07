@@ -1,10 +1,7 @@
 import { getSupabaseServerClient } from "@/lib/supabase/server"
-import { AccountCard } from "@/components/dashboard/account-card"
-import { QuickActions } from "@/components/dashboard/quick-actions"
-import { TransactionList } from "@/components/dashboard/transaction-list"
 import { SpendingInsights } from "@/components/analytics/spending-insights"
 
-export default async function DashboardPage() {
+export default async function InsightsPage() {
   const supabase = getSupabaseServerClient()
 
   // Try to get the session, but don't redirect if it fails
@@ -13,32 +10,18 @@ export default async function DashboardPage() {
   } = await supabase.auth.getSession()
 
   // Use demo data if no session is available
-  let accounts = []
   let transactions = []
-  let userName = "Guest"
 
   if (session?.user?.id) {
     try {
-      // Get user data
-      const { data: userData } = await supabase.from("users").select("*").eq("id", session.user.id).single()
-
-      if (userData) {
-        userName = `${userData.first_name} ${userData.last_name}`
-      }
-
       // Get user accounts
-      const { data: userAccounts, error: accountsError } = await supabase
+      const { data: accounts, error: accountsError } = await supabase
         .from("accounts")
         .select("*")
         .eq("user_id", session.user.id)
-        .order("is_primary", { ascending: false })
 
-      if (!accountsError && userAccounts) {
-        accounts = userAccounts
-      }
-
-      // Get recent transactions
-      if (accounts.length > 0) {
+      if (!accountsError && accounts && accounts.length > 0) {
+        // Get all transactions
         const { data: userTransactions, error: transactionsError } = await supabase
           .from("transactions")
           .select("*")
@@ -47,40 +30,15 @@ export default async function DashboardPage() {
             accounts.map((account) => account.id),
           )
           .order("created_at", { ascending: false })
-          .limit(10)
 
         if (!transactionsError && userTransactions) {
           transactions = userTransactions
         }
       }
     } catch (err) {
-      console.error("Error fetching dashboard data:", err)
+      console.error("Error fetching insights data:", err)
       // Continue with demo data
     }
-  }
-
-  // If no real accounts, use demo data
-  if (accounts.length === 0) {
-    accounts = [
-      {
-        id: "demo-1",
-        account_name: "Checking Account",
-        account_type: "checking",
-        account_number: "1234567890",
-        balance: 5280.42,
-        currency: "USD",
-        is_primary: true,
-      },
-      {
-        id: "demo-2",
-        account_name: "Savings Account",
-        account_type: "savings",
-        account_number: "0987654321",
-        balance: 12750.89,
-        currency: "USD",
-        is_primary: false,
-      },
-    ]
   }
 
   // If no real transactions, use demo data
@@ -146,43 +104,77 @@ export default async function DashboardPage() {
         category: "dining",
         created_at: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000).toISOString(),
       },
+      {
+        id: "demo-tx-6",
+        account_id: "demo-1",
+        transaction_type: "payment",
+        amount: 120.0,
+        description: "Phone Bill",
+        recipient_name: "Mobile Carrier",
+        recipient_account: "1122334455",
+        status: "completed",
+        category: "utilities",
+        created_at: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
+      },
+      {
+        id: "demo-tx-7",
+        account_id: "demo-1",
+        transaction_type: "payment",
+        amount: 65.5,
+        description: "Online Shopping",
+        recipient_name: "Amazon",
+        recipient_account: "9988776655",
+        status: "completed",
+        category: "shopping",
+        created_at: new Date(Date.now() - 18 * 24 * 60 * 60 * 1000).toISOString(),
+      },
+      {
+        id: "demo-tx-8",
+        account_id: "demo-1",
+        transaction_type: "payment",
+        amount: 42.99,
+        description: "Streaming Service",
+        recipient_name: "Spotify",
+        recipient_account: "5544332211",
+        status: "completed",
+        category: "entertainment",
+        created_at: new Date(Date.now() - 22 * 24 * 60 * 60 * 1000).toISOString(),
+      },
+      {
+        id: "demo-tx-9",
+        account_id: "demo-1",
+        transaction_type: "payment",
+        amount: 55.0,
+        description: "Gas Station",
+        recipient_name: "Shell",
+        recipient_account: "1122334455",
+        status: "completed",
+        category: "transportation",
+        created_at: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000).toISOString(),
+      },
+      {
+        id: "demo-tx-10",
+        account_id: "demo-1",
+        transaction_type: "deposit",
+        amount: 150.0,
+        description: "Refund",
+        recipient_name: null,
+        recipient_account: null,
+        status: "completed",
+        category: "income",
+        created_at: new Date(Date.now() - 28 * 24 * 60 * 60 * 1000).toISOString(),
+      },
     ]
   }
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Welcome, {userName}</h1>
-          <p className="text-muted-foreground">Here's an overview of your finances</p>
-        </div>
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight">Spending Insights</h1>
+        <p className="text-muted-foreground">Analyze your spending patterns and financial habits</p>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
-        {accounts.map((account) => (
-          <AccountCard
-            key={account.id}
-            accountName={account.account_name}
-            accountNumber={account.account_number}
-            balance={account.balance}
-            currency={account.currency}
-            type={account.account_type === "checking" ? "primary" : "secondary"}
-          />
-        ))}
-      </div>
-
-      <QuickActions />
-
-      <div className="grid gap-6 md:grid-cols-2">
-        <div>
-          <h2 className="mb-4 text-xl font-semibold">Recent Transactions</h2>
-          <TransactionList transactions={transactions} />
-        </div>
-        <div>
-          <h2 className="mb-4 text-xl font-semibold">Spending Summary</h2>
-          <SpendingInsights transactions={transactions} />
-        </div>
-      </div>
+      <SpendingInsights transactions={transactions} />
     </div>
   )
 }

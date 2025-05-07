@@ -21,7 +21,7 @@ export default function LoginPage() {
         <Link href="/" className="inline-block">
           <h1 className="text-4xl font-bold text-primary">Kohlawise</h1>
         </Link>
-        <p className="mt-2 text-muted-foreground">Your modern financial companion</p>
+        <p className="mt-2 text-muted-foreground">Effortless Banking Simplified</p>
       </motion.div>
 
       <Card className="w-full max-w-md glassmorphism">
@@ -30,7 +30,7 @@ export default function LoginPage() {
             <button
               onClick={() => setActiveTab("login")}
               className={`flex-1 rounded-sm px-3 py-2 text-sm font-medium ${
-                activeTab === "login" ? "bg-background shadow" : "text-muted-foreground"
+                activeTab === "login" ? "bg-primary text-primary-foreground" : "text-muted-foreground"
               }`}
             >
               Sign In
@@ -38,7 +38,7 @@ export default function LoginPage() {
             <button
               onClick={() => setActiveTab("register")}
               className={`flex-1 rounded-sm px-3 py-2 text-sm font-medium ${
-                activeTab === "register" ? "bg-background shadow" : "text-muted-foreground"
+                activeTab === "register" ? "bg-primary text-primary-foreground" : "text-muted-foreground"
               }`}
             >
               Sign Up

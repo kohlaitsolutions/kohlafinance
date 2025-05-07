@@ -2,42 +2,60 @@
 
 import { useState } from "react"
 import { motion } from "framer-motion"
-import { Eye, EyeOff } from "lucide-react"
-
-import { Button } from "@/components/ui/button"
-import type { Account } from "@/lib/types"
+import { Eye, EyeOff, CreditCard } from "lucide-react"
 import { formatCurrency } from "@/lib/utils"
 
 type AccountCardProps = {
-  account: Account
+  accountName: string
+  accountNumber: string
+  balance: number
+  currency?: string
+  type?: "primary" | "secondary" | "tertiary"
+  onClick?: () => void
 }
 
-export function AccountCard({ account }: AccountCardProps) {
+export function AccountCard({
+  accountName,
+  accountNumber,
+  balance,
+  currency = "USD",
+  type = "primary",
+  onClick,
+}: AccountCardProps) {
   const [showBalance, setShowBalance] = useState(true)
 
+  const gradientClass =
+    type === "primary" ? "bg-gradient-card" : type === "secondary" ? "bg-gradient-card-green" : "bg-gradient-card-blue"
+
   return (
-    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
-      <div className="account-card">
-        <div className="flex items-center justify-between">
-          <div className="text-sm font-medium text-white/80">{account.account_type}</div>
-          <Button variant="ghost" size="icon" onClick={() => setShowBalance(!showBalance)} className="text-white/90">
-            {showBalance ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-            <span className="sr-only">{showBalance ? "Hide balance" : "Show balance"}</span>
-          </Button>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+      className={`account-card ${gradientClass} card-hover cursor-pointer`}
+      onClick={onClick}
+    >
+      <div className="flex justify-between items-start">
+        <div>
+          <h3 className="text-lg font-semibold">{accountName}</h3>
+          <div className="account-card-number mt-1">•••• {accountNumber.slice(-4)}</div>
         </div>
-
-        <div className="mb-4 text-lg font-semibold text-white">{account.account_name}</div>
-
-        <div className="flex items-end gap-2">
-          <div className="text-2xl font-bold text-white">
-            {showBalance ? formatCurrency(account.balance, account.currency) : "••••••"}
-          </div>
-        </div>
-
-        <div className="mt-4 flex items-center justify-between text-sm">
-          <div className="text-white/80">Account Number</div>
-          <div className="font-medium text-white">•••• {account.account_number.slice(-4)}</div>
-        </div>
+        <button
+          onClick={(e) => {
+            e.stopPropagation()
+            setShowBalance(!showBalance)
+          }}
+          className="p-1 rounded-full hover:bg-white/10"
+        >
+          {showBalance ? <EyeOff size={18} /> : <Eye size={18} />}
+        </button>
+      </div>
+      <div className="mt-6">
+        <div className="text-sm opacity-80">Available Balance</div>
+        <div className="account-card-balance">{showBalance ? formatCurrency(balance, currency) : "••••••"}</div>
+      </div>
+      <div className="absolute bottom-4 right-4 opacity-20">
+        <CreditCard size={48} />
       </div>
     </motion.div>
   )

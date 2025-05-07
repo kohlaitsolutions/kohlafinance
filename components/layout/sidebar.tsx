@@ -2,118 +2,125 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { usePathname, useRouter } from "next/navigation"
-import { motion } from "framer-motion"
-import { BarChart, CreditCard, Home, LogOut, Menu, Settings, Share, TrendingUp, User, Wallet, X } from "lucide-react"
+import { usePathname } from "next/navigation"
+import { BarChart3, CreditCard, Home, LogOut, Settings, User, Wallet, Bitcoin, TrendingUp } from "lucide-react"
 
-import { Button } from "@/components/ui/button"
-import { getSupabaseBrowserClient } from "@/lib/supabase/client"
 import { cn } from "@/lib/utils"
-
-const sidebarItems = [
-  {
-    title: "Dashboard",
-    href: "/dashboard",
-    icon: Home,
-  },
-  {
-    title: "Transactions",
-    href: "/transactions",
-    icon: Wallet,
-  },
-  {
-    title: "Payments",
-    href: "/payments",
-    icon: CreditCard,
-  },
-  {
-    title: "Analytics",
-    href: "/analytics",
-    icon: BarChart,
-  },
-  {
-    title: "Invest",
-    href: "/invest",
-    icon: TrendingUp,
-  },
-  {
-    title: "Refer",
-    href: "/refer",
-    icon: Share,
-  },
-  {
-    title: "Account",
-    href: "/account",
-    icon: User,
-  },
-  {
-    title: "Settings",
-    href: "/settings",
-    icon: Settings,
-  },
-]
+import { Button } from "@/components/ui/button"
+import { ScrollArea } from "@/components/ui/scroll-area"
 
 export function Sidebar() {
-  const [isOpen, setIsOpen] = useState(false)
   const pathname = usePathname()
-  const router = useRouter()
-  const supabase = getSupabaseBrowserClient()
+  const [isOpen, setIsOpen] = useState(true)
 
-  const handleSignOut = async () => {
-    await supabase.auth.signOut()
-    router.push("/login")
-    router.refresh()
+  const toggleSidebar = () => {
+    setIsOpen(!isOpen)
   }
+
+  const routes = [
+    {
+      label: "Dashboard",
+      icon: Home,
+      href: "/dashboard",
+      active: pathname === "/dashboard",
+    },
+    {
+      label: "Transactions",
+      icon: CreditCard,
+      href: "/transactions",
+      active: pathname === "/transactions",
+    },
+    {
+      label: "Payments",
+      icon: Wallet,
+      href: "/payments",
+      active: pathname.startsWith("/payments"),
+    },
+    {
+      label: "Invest",
+      icon: Bitcoin,
+      href: "/invest",
+      active: pathname.startsWith("/invest"),
+    },
+    {
+      label: "Spending Insights",
+      icon: TrendingUp,
+      href: "/insights",
+      active: pathname === "/insights",
+    },
+    {
+      label: "Analytics",
+      icon: BarChart3,
+      href: "/analytics",
+      active: pathname === "/analytics",
+    },
+    {
+      label: "Account",
+      icon: User,
+      href: "/account",
+      active: pathname === "/account",
+    },
+    {
+      label: "Settings",
+      icon: Settings,
+      href: "/settings",
+      active: pathname === "/settings",
+    },
+  ]
 
   return (
     <>
-      <motion.aside
-        initial={{ x: -300 }}
-        animate={{ x: isOpen ? 0 : -300 }}
-        transition={{ duration: 0.3, ease: "easeInOut" }}
-        className="fixed inset-y-0 left-0 z-40 flex w-64 flex-col bg-background shadow-lg md:static md:translate-x-0"
+      <div
+        className={cn(
+          "fixed inset-y-0 left-0 z-50 flex w-64 flex-col bg-card transition-transform duration-300 ease-in-out md:relative md:translate-x-0",
+          isOpen ? "translate-x-0" : "-translate-x-full",
+        )}
       >
-        <div className="flex h-16 items-center justify-between border-b px-6">
-          <Link href="/dashboard" className="flex items-center gap-2">
-            <span className="text-xl font-bold text-primary">Kohlawise</span>
+        <div className="flex h-14 items-center border-b px-4">
+          <Link href="/dashboard" className="flex items-center gap-2 font-semibold">
+            <Wallet className="h-6 w-6 text-primary" />
+            <span className="text-lg">Kohlawise</span>
           </Link>
-          <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setIsOpen(false)}>
-            <X className="h-4 w-4" />
+          <Button variant="ghost" size="icon" className="ml-auto md:hidden" onClick={toggleSidebar}>
+            <CreditCard className="h-4 w-4" />
+            <span className="sr-only">Toggle Sidebar</span>
           </Button>
         </div>
-
-        <nav className="flex-1 space-y-1 p-4">
-          {sidebarItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
-                pathname === item.href || pathname.startsWith(`${item.href}/`)
-                  ? "bg-primary text-primary-foreground"
-                  : "hover:bg-muted",
-              )}
-            >
-              <item.icon className="h-4 w-4" />
-              {item.title}
-            </Link>
-          ))}
-        </nav>
-
-        <div className="border-t p-4">
-          <Button variant="ghost" className="w-full justify-start" onClick={handleSignOut}>
-            <LogOut className="mr-2 h-4 w-4" />
-            Sign out
-          </Button>
+        <ScrollArea className="flex-1 px-2 py-4">
+          <nav className="flex flex-col gap-1">
+            {routes.map((route) => (
+              <Link
+                key={route.href}
+                href={route.href}
+                className={cn(
+                  "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
+                  route.active
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                )}
+              >
+                <route.icon className="h-4 w-4" />
+                {route.label}
+              </Link>
+            ))}
+          </nav>
+        </ScrollArea>
+        <div className="mt-auto border-t p-4">
+          <form action="/api/auth/signout" method="post">
+            <Button variant="ghost" className="w-full justify-start gap-2" type="submit">
+              <LogOut className="h-4 w-4" />
+              Sign Out
+            </Button>
+          </form>
         </div>
-      </motion.aside>
-
-      {/* Menu toggle button positioned below the welcome text */}
-      <div className="fixed left-0 top-24 z-50 p-4 md:hidden">
-        <Button variant="outline" size="icon" className="rounded-full shadow-md" onClick={() => setIsOpen(!isOpen)}>
-          <Menu className="h-4 w-4" />
-        </Button>
       </div>
+      <div
+        className={cn(
+          "fixed inset-0 z-40 bg-background/80 backdrop-blur-sm transition-all duration-300 md:hidden",
+          isOpen ? "opacity-100" : "pointer-events-none opacity-0",
+        )}
+        onClick={toggleSidebar}
+      />
     </>
   )
 }

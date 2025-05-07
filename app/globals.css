@@ -4,52 +4,76 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 162 73% 46%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --background: 0 0% 10%;
+    --foreground: 0 0% 98%;
+    --card: 0 0% 15%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 15%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 330 100% 60%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 10% 20%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 10% 20%;
+    --muted-foreground: 240 5% 65%;
+    --accent: 142 71% 45%;
+    --accent-foreground: 0 0% 100%;
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 162 73% 46%;
-    --radius: 0.75rem;
-    --positive: 220 90% 56%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 10% 20%;
+    --input: 240 10% 20%;
+    --ring: 330 100% 60%;
+    --radius: 1rem;
+    --positive: 142 71% 45%;
+    --negative: 0 84.2% 60.2%;
+  }
+
+  .light {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 10%;
+    --card: 0 0% 98%;
+    --card-foreground: 0 0% 10%;
+    --popover: 0 0% 98%;
+    --popover-foreground: 0 0% 10%;
+    --primary: 330 100% 60%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 5% 96%;
+    --secondary-foreground: 240 10% 20%;
+    --muted: 240 5% 96%;
+    --muted-foreground: 240 5% 65%;
+    --accent: 142 71% 45%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5% 90%;
+    --input: 240 5% 90%;
+    --ring: 330 100% 60%;
+    --positive: 142 71% 45%;
     --negative: 0 84.2% 60.2%;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 162 73% 46%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 162 73% 46%;
-    --positive: 220 90% 56%;
-    --negative: 0 62.8% 30.6%;
+    --background: 0 0% 10%;
+    --foreground: 0 0% 98%;
+    --card: 0 0% 15%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 15%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 330 100% 60%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 10% 20%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 10% 20%;
+    --muted-foreground: 240 5% 65%;
+    --accent: 142 71% 45%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 10% 20%;
+    --input: 240 10% 20%;
+    --ring: 330 100% 60%;
+    --positive: 142 71% 45%;
+    --negative: 0 84.2% 60.2%;
   }
 }
 
@@ -64,16 +88,16 @@
 
 /* Glassmorphism effect */
 .glassmorphism {
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(25, 25, 25, 0.7);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
 }
 
-.dark .glassmorphism {
-  background: rgba(17, 25, 40, 0.75);
-  border: 1px solid rgba(255, 255, 255, 0.125);
+.light .glassmorphism {
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 /* Parallax scrolling */
@@ -108,16 +132,28 @@
 
 .card-hover:hover {
   transform: translateY(-5px);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
 }
 
-.dark .card-hover:hover {
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+.light .card-hover:hover {
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
 /* Modern gradient backgrounds */
 .bg-gradient-modern {
   background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.8) 100%);
+}
+
+.bg-gradient-card {
+  background: linear-gradient(135deg, hsl(330 100% 60%) 0%, hsl(280 100% 60%) 100%);
+}
+
+.bg-gradient-card-green {
+  background: linear-gradient(135deg, hsl(142 71% 45%) 0%, hsl(160 71% 45%) 100%);
+}
+
+.bg-gradient-card-blue {
+  background: linear-gradient(135deg, hsl(220 100% 60%) 0%, hsl(250 100% 60%) 100%);
 }
 
 .bg-gradient-subtle {
@@ -126,12 +162,11 @@
 
 /* Account card styles */
 .account-card {
-  background-color: hsl(var(--primary));
-  color: white;
   border-radius: var(--radius);
   padding: 1.5rem;
   position: relative;
   overflow: hidden;
+  color: white;
 }
 
 .account-card-number {
@@ -180,7 +215,7 @@
   bottom: 0;
   left: 0;
   right: 0;
-  background-color: white;
+  background-color: hsl(var(--background));
   padding: 0.75rem 0;
   border-top: 1px solid hsl(var(--border));
   z-index: 50;
@@ -195,4 +230,43 @@
 
 .mobile-nav-icon {
   margin-bottom: 0.25rem;
+}
+
+/* Progress bar styles */
+.progress-bar {
+  height: 8px;
+  border-radius: 4px;
+  background-color: hsl(var(--muted));
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  background-color: hsl(var(--primary));
+}
+
+/* Spending insights styles */
+.insight-card {
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  background-color: hsl(var(--card));
+  margin-bottom: 1rem;
+}
+
+.insight-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.insight-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.insight-description {
+  font-size: 0.875rem;
+  color: hsl(var(--muted-foreground));
 }

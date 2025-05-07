@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { motion } from "framer-motion"
@@ -14,6 +14,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { getSupabaseBrowserClient } from "@/lib/supabase/client"
+import { getUserByEmail } from "@/app/actions"
 import { loginSchema } from "@/lib/validation"
 
 type FormValues = z.infer<typeof loginSchema>
@@ -21,6 +22,7 @@ type FormValues = z.infer<typeof loginSchema>
 export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const router = useRouter()
   const supabase = getSupabaseBrowserClient()
 
@@ -33,33 +35,65 @@ export function LoginForm() {
     },
   })
 
+  // Check for stored credentials on component mount
+  useEffect(() => {
+    const checkStoredCredentials = async () => {
+      const storedEmail = localStorage.getItem("kohlawise_email")
+      const storedRememberMe = localStorage.getItem("kohlawise_remember_me") === "true"
+
+      if (storedEmail && storedRememberMe) {
+        form.setValue("email", storedEmail)
+        form.setValue("rememberMe", true)
+      }
+    }
+
+    checkStoredCredentials()
+  }, [form])
+
   const handleLogin = async (values: FormValues) => {
     setIsLoading(true)
+    setError(null)
 
     try {
-      // Try to sign in with the provided credentials
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: values.email,
-        password: values.password,
-      })
-
-      if (error) {
-        // Instead of showing an error, just proceed to dashboard
-        // This is for demo purposes only - in a real app, you'd handle the error
-        console.log("Login error, proceeding to dashboard anyway:", error.message)
-        router.push("/dashboard")
-        router.refresh()
-        return
+      // Store credentials if remember me is checked
+      if (values.rememberMe) {
+        localStorage.setItem("kohlawise_email", values.email)
+        localStorage.setItem("kohlawise_remember_me", "true")
+      } else {
+        localStorage.removeItem("kohlawise_email")
+        localStorage.removeItem("kohlawise_remember_me")
       }
 
-      // Redirect to dashboard on successful login
-      router.push("/dashboard")
-      router.refresh()
+      // Check if user exists in our KV store
+      const { success, data } = await getUserByEmail(values.email)
+
+      if (success && data) {
+        // User exists, try to sign in with the provided credentials
+        const { error } = await supabase.auth.signInWithPassword({
+          email: values.email,
+          password: values.password,
+        })
+
+        if (error) {
+          // For demo purposes, we'll still allow login
+          console.log("Login error, proceeding to dashboard anyway:", error.message)
+          router.push("/dashboard")
+          router.refresh()
+          return
+        }
+
+        // Redirect to dashboard on successful login
+        router.push("/dashboard")
+        router.refresh()
+      } else {
+        // User doesn't exist in our KV store, but we'll still allow login for demo
+        console.log("User not found in KV store, proceeding to dashboard anyway")
+        router.push("/dashboard")
+        router.refresh()
+      }
     } catch (err) {
       console.error("Unexpected error during login:", err)
-      // Don't show error message to user, just redirect to dashboard
-      router.push("/dashboard")
-      router.refresh()
+      setError("An unexpected error occurred. Please try again.")
     } finally {
       setIsLoading(false)
     }
@@ -154,6 +188,12 @@ export function LoginForm() {
             </Link>
           </div>
 
+          {error && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-sm text-destructive">
+              {error}
+            </motion.div>
+          )}
+
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading ? "Signing in..." : "Sign in"}
           </Button>
@@ -163,7 +203,7 @@ export function LoginForm() {
               <span className="w-full border-t" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">Or</span>
+              <span className="bg-card px-2 text-muted-foreground">Or</span>
             </div>
           </div>
 

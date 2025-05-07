@@ -14,7 +14,7 @@ export default async function DashboardPage() {
   // Use demo data if no session is available
   let accounts = []
   let transactions = []
-  let userData = { first_name: "Demo", last_name: "User" }
+  let userData = { first_name: "Default", last_name: "User" }
 
   if (session?.user?.id) {
     // If we have a session, try to get real data

@@ -2,11 +2,12 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import { BarChart, CreditCard, Home, LogOut, Menu, Settings, User, Wallet, X } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
+import { getSupabaseBrowserClient } from "@/lib/supabase/client"
 import { cn } from "@/lib/utils"
 
 const sidebarItems = [
@@ -45,6 +46,14 @@ const sidebarItems = [
 export function Sidebar() {
   const [isOpen, setIsOpen] = useState(false)
   const pathname = usePathname()
+  const router = useRouter()
+  const supabase = getSupabaseBrowserClient()
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut()
+    router.push("/login")
+    router.refresh()
+  }
 
   return (
     <>
@@ -86,11 +95,9 @@ export function Sidebar() {
         </nav>
 
         <div className="border-t p-4">
-          <Button variant="ghost" className="w-full justify-start" asChild>
-            <Link href="/api/auth/signout">
-              <LogOut className="mr-2 h-4 w-4" />
-              Sign out
-            </Link>
+          <Button variant="ghost" className="w-full justify-start" onClick={handleSignOut}>
+            <LogOut className="mr-2 h-4 w-4" />
+            Sign out
           </Button>
         </div>
       </motion.aside>

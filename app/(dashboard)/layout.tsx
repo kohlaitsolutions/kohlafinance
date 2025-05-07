@@ -19,6 +19,9 @@ export default async function DashboardLayout({
     data: { session },
   } = await supabase.auth.getSession()
 
+  // Check if user is authenticated
+  const isAuthenticated = !!session?.user
+
   // Use the session user ID if available, otherwise use the demo ID
   const userId = session?.user?.id || demoUserId
 
@@ -45,7 +48,7 @@ export default async function DashboardLayout({
       <div className="flex flex-1">
         <Sidebar />
         <div className="flex flex-1 flex-col">
-          <Header notifications={notifications} />
+          <Header notifications={notifications} isAuthenticated={isAuthenticated} />
           <main className="flex-1 p-4 md:p-6">{children}</main>
         </div>
       </div>

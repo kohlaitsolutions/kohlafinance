@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { getSupabaseBrowserClient } from "@/lib/supabase/client"
-import { autoVerifyUser } from "@/app/actions"
+import { storeUserCredentials } from "@/app/actions"
 
 export function RegisterForm() {
   const [email, setEmail] = useState("")
@@ -48,8 +48,13 @@ export function RegisterForm() {
       }
 
       if (data.user) {
-        // Auto-verify the user on the server
-        await autoVerifyUser(data.user.id)
+        // Store user credentials in Upstash KV
+        await storeUserCredentials({
+          userId: data.user.id,
+          email,
+          firstName,
+          lastName,
+        })
 
         // Sign in the user immediately
         await supabase.auth.signInWithPassword({

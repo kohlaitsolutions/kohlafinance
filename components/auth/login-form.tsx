@@ -13,8 +13,8 @@ import { Label } from "@/components/ui/label"
 import { getSupabaseBrowserClient } from "@/lib/supabase/client"
 
 export function LoginForm() {
-  const [email, setEmail] = useState("suubiphillip21@gmail.com")
-  const [password, setPassword] = useState("tinkler0703")
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -34,35 +34,8 @@ export function LoginForm() {
       })
 
       if (error) {
-        // If the error is about email verification, we'll try to auto-verify
-        if (error.message.includes("Email not confirmed")) {
-          // Try to get the user by email
-          const { data: userData } = await supabase.auth.admin.getUserByEmail(email)
-
-          if (userData?.user) {
-            // Update the user to be confirmed
-            await supabase.auth.admin.updateUserById(userData.user.id, {
-              email_confirm: true,
-            })
-
-            // Try signing in again
-            const { error: signInError } = await supabase.auth.signInWithPassword({
-              email,
-              password,
-            })
-
-            if (signInError) {
-              setError(signInError.message)
-              return
-            }
-          } else {
-            setError("User not found")
-            return
-          }
-        } else {
-          setError(error.message)
-          return
-        }
+        setError(error.message)
+        return
       }
 
       // Redirect to dashboard on successful login

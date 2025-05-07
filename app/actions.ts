@@ -5,6 +5,7 @@ import { redirect } from "next/navigation"
 
 import { getSupabaseServerClient } from "@/lib/supabase/server"
 import { generateAccountNumber, generateCardNumber } from "@/lib/utils"
+import { storeInKV, getFromKV } from "@/lib/upstash"
 
 export async function createAccount(formData: FormData) {
   const supabase = getSupabaseServerClient()
@@ -265,5 +266,50 @@ export async function autoVerifyUser(userId: string) {
   } catch (error) {
     console.error("Error in autoVerifyUser action:", error)
     return { success: false, error: "Server error auto-verifying user" }
+  }
+}
+
+// New actions for Upstash KV integration
+export async function storeUserCredentials(userData: {
+  userId: string
+  email: string
+  firstName: string
+  lastName: string
+}) {
+  try {
+    // Store user credentials in Upstash KV
+    // Use the user ID as the key
+    const key = `user:${userData.userId}`
+    await storeInKV(key, userData)
+
+    // Also store a mapping from email to user ID for easy lookup
+    const emailKey = `email:${userData.email}`
+    await storeInKV(emailKey, userData.userId)
+
+    return { success: true }
+  } catch (error) {
+    console.error("Error storing user credentials:", error)
+    return { success: false, error: "Failed to store user credentials" }
+  }
+}
+
+export async function getUserByEmail(email: string) {
+  try {
+    // Get the user ID from the email mapping
+    const emailKey = `email:${email}`
+    const userId = await getFromKV<string>(emailKey)
+
+    if (!userId) {
+      return { success: false, error: "User not found" }
+    }
+
+    // Get the user data using the user ID
+    const userKey = `user:${userId}`
+    const userData = await getFromKV(userKey)
+
+    return { success: true, data: userData }
+  } catch (error) {
+    console.error("Error getting user by email:", error)
+    return { success: false, error: "Failed to get user" }
   }
 }

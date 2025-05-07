@@ -2,8 +2,9 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
-import { Bell, Search } from "lucide-react"
+import { Bell, LogIn, LogOut, Search, User } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -15,16 +16,26 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
+import { getSupabaseBrowserClient } from "@/lib/supabase/client"
 import type { Notification } from "@/lib/types"
 
 type HeaderProps = {
   notifications: Notification[]
+  isAuthenticated?: boolean
 }
 
-export function Header({ notifications }: HeaderProps) {
+export function Header({ notifications, isAuthenticated = false }: HeaderProps) {
   const [isSearchOpen, setIsSearchOpen] = useState(false)
+  const router = useRouter()
+  const supabase = getSupabaseBrowserClient()
 
   const unreadNotifications = notifications.filter((notification) => !notification.is_read)
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut()
+    router.push("/login")
+    router.refresh()
+  }
 
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background/95 px-4 backdrop-blur md:px-6">
@@ -76,6 +87,44 @@ export function Header({ notifications }: HeaderProps) {
                 ))
               ) : (
                 <div className="p-4 text-center text-sm text-muted-foreground">No new notifications</div>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {/* User menu with sign in/out options */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="relative">
+                <User className="h-4 w-4" />
+                <span className="sr-only">User menu</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {isAuthenticated ? (
+                <>
+                  <DropdownMenuLabel>Account</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link href="/account">Profile</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/settings">Settings</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleSignOut}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Sign out
+                  </DropdownMenuItem>
+                </>
+              ) : (
+                <>
+                  <DropdownMenuItem asChild>
+                    <Link href="/login">
+                      <LogIn className="mr-2 h-4 w-4" />
+                      Sign in
+                    </Link>
+                  </DropdownMenuItem>
+                </>
               )}
             </DropdownMenuContent>
           </DropdownMenu>

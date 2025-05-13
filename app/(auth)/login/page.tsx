@@ -6,6 +6,7 @@ import { motion } from "framer-motion"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader } from "@/components/ui/card"
 import { LoginForm } from "@/components/auth/login-form"
 import { RegisterForm } from "@/components/auth/register-form"
+import { Toaster } from "@/components/ui/toaster"
 
 export default function LoginPage() {
   const [activeTab, setActiveTab] = useState<"login" | "register">("login")
@@ -28,6 +29,7 @@ export default function LoginPage() {
         <CardHeader>
           <div className="flex w-full space-x-1 rounded-md bg-muted p-1">
             <button
+              type="button"
               onClick={() => setActiveTab("login")}
               className={`flex-1 rounded-sm px-3 py-2 text-sm font-medium ${
                 activeTab === "login" ? "bg-primary text-primary-foreground" : "text-muted-foreground"
@@ -36,6 +38,7 @@ export default function LoginPage() {
               Sign In
             </button>
             <button
+              type="button"
               onClick={() => setActiveTab("register")}
               className={`flex-1 rounded-sm px-3 py-2 text-sm font-medium ${
                 activeTab === "register" ? "bg-primary text-primary-foreground" : "text-muted-foreground"
@@ -72,6 +75,7 @@ export default function LoginPage() {
           </div>
         </CardFooter>
       </Card>
+      <Toaster />
     </div>
   )
 }

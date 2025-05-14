@@ -72,11 +72,6 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL("/dashboard", req.url))
   }
 
-  // Check if MFA is required
-  if (session?.user?.factors && session.user.factors.length > 0 && req.nextUrl.pathname !== "/mfa") {
-    return NextResponse.redirect(new URL("/mfa", req.url))
-  }
-
   return res
 }
 

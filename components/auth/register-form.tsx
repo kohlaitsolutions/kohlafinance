@@ -10,9 +10,9 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/components/ui/use-toast"
 import { validateEmail, validateName, validatePassword } from "@/lib/form-validation"
+import { getSupabaseBrowserClient } from "@/lib/supabase/client"
 import { PasswordStrengthMeter, calculatePasswordStrength } from "./password-strength-meter"
 import { SocialLoginButtons } from "./social-login-buttons"
-import { useAuth } from "@/lib/auth/auth-context"
 
 export function RegisterForm() {
   // Form state
@@ -35,7 +35,7 @@ export function RegisterForm() {
 
   const router = useRouter()
   const { toast } = useToast()
-  const { register } = useAuth()
+  const supabase = getSupabaseBrowserClient()
 
   // Validate first name on blur
   const handleFirstNameBlur = () => {
@@ -100,35 +100,47 @@ export function RegisterForm() {
     setIsLoading(true)
 
     try {
-      // Register with auth context
-      const { success, error } = await register({
-        firstName,
-        lastName,
+      // Sign up with Supabase
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
+        options: {
+          data: {
+            first_name: firstName,
+            last_name: lastName,
+          },
+          emailRedirectTo: `${window.location.origin}/auth/verify`,
+        },
       })
 
       if (error) {
-        setFormError(error)
+        throw error
+      }
+
+      // Check if email confirmation is required
+      if (data?.user?.identities?.length === 0) {
+        setIsVerificationSent(true)
+        toast({
+          title: "Account already exists",
+          description: "Please check your email for a verification link.",
+        })
         return
       }
 
-      if (success) {
-        // Store email for login convenience
-        localStorage.setItem("kohlawise_email", email)
+      // Store email for login convenience
+      localStorage.setItem("kohlawise_email", email)
 
-        setIsVerificationSent(true)
-        toast({
-          title: "Registration successful!",
-          description: "Please check your email for a verification link.",
-        })
+      setIsVerificationSent(true)
+      toast({
+        title: "Registration successful!",
+        description: "Please check your email for a verification link.",
+      })
 
-        // For demo purposes, redirect to dashboard
-        setTimeout(() => {
-          router.push("/dashboard")
-          router.refresh()
-        }, 3000)
-      }
+      // For demo purposes, redirect to dashboard
+      setTimeout(() => {
+        router.push("/dashboard")
+        router.refresh()
+      }, 3000)
     } catch (error: any) {
       console.error("Registration error:", error)
       setFormError(error.message || "An unexpected error occurred. Please try again.")

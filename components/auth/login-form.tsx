@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label"
 import { useToast } from "@/components/ui/use-toast"
 import { validateEmail } from "@/lib/form-validation"
 import { SocialLoginButtons } from "./social-login-buttons"
+import { useAuth } from "@/lib/auth/auth-context"
 
 export function LoginForm() {
   // Form state
@@ -31,9 +32,10 @@ export function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { toast } = useToast()
+  const { login } = useAuth()
 
   // Check for redirect parameter
-  const redirectTo = searchParams?.get("redirect") || "/dashboard"
+  const redirectTo = searchParams.get("redirect") || "/dashboard"
 
   // Check for stored credentials on component mount
   useEffect(() => {
@@ -98,17 +100,30 @@ export function LoginForm() {
         localStorage.removeItem("kohlawise_remember_me")
       }
 
-      // For demo purposes, we'll still allow login
-      console.log("Login successful, redirecting to:", redirectTo)
+      // Sign in with auth context
+      const { success, requiresMfa, error } = await login(email, password)
 
-      toast({
-        title: "Welcome back!",
-        description: "You've been logged in successfully.",
-      })
+      if (error) {
+        setFormError(error)
+        return
+      }
 
-      // Redirect to dashboard
-      router.push(redirectTo)
-      router.refresh()
+      if (requiresMfa) {
+        // Redirect to MFA verification page
+        router.push("/mfa")
+        return
+      }
+
+      if (success) {
+        toast({
+          title: "Welcome back!",
+          description: "You've been logged in successfully.",
+        })
+
+        // Redirect to the intended destination
+        router.push(redirectTo)
+        router.refresh()
+      }
     } catch (error: any) {
       console.error("Login error:", error)
       setFormError("An unexpected error occurred. Please try again.")

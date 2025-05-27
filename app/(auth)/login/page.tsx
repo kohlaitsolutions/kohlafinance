@@ -6,7 +6,6 @@ import { motion } from "framer-motion"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader } from "@/components/ui/card"
 import { LoginForm } from "@/components/auth/login-form"
 import { RegisterForm } from "@/components/auth/register-form"
-import { Toaster } from "@/components/ui/toaster"
 
 export default function LoginPage() {
   const [activeTab, setActiveTab] = useState<"login" | "register">("login")
@@ -75,7 +74,6 @@ export default function LoginPage() {
           </div>
         </CardFooter>
       </Card>
-      <Toaster />
     </div>
   )
 }

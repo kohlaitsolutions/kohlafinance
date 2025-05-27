@@ -1,89 +1,36 @@
 "use client"
 
-import { useState, type FormEvent, useEffect } from "react"
+import { useState, type FormEvent } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { motion } from "framer-motion"
-import { Eye, EyeOff, Lock, Mail, AlertCircle, Loader2 } from "lucide-react"
+import { Eye, EyeOff, Lock, Mail } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { useToast } from "@/components/ui/use-toast"
-import { validateEmail } from "@/lib/form-validation"
-import { getSupabaseBrowserClient } from "@/lib/supabase/client"
-import { SocialLoginButtons } from "./social-login-buttons"
 
 export function LoginForm() {
-  // Form state
+  const [showPassword, setShowPassword] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [rememberMe, setRememberMe] = useState(false)
-  const [showPassword, setShowPassword] = useState(false)
-
-  // Validation state
-  const [emailError, setEmailError] = useState<string | null>(null)
-  const [passwordError, setPasswordError] = useState<string | null>(null)
-  const [formError, setFormError] = useState<string | null>(null)
-
-  // UI state
-  const [isLoading, setIsLoading] = useState(false)
-
   const router = useRouter()
-  const { toast } = useToast()
-  const supabase = getSupabaseBrowserClient()
 
   // Check for stored credentials on component mount
-  useEffect(() => {
-    const checkStoredCredentials = () => {
-      const storedEmail = localStorage.getItem("kohlawise_email")
-      const storedRememberMe = localStorage.getItem("kohlawise_remember_me") === "true"
+  useState(() => {
+    const storedEmail = localStorage.getItem("kohlawise_email")
+    const storedRememberMe = localStorage.getItem("kohlawise_remember_me") === "true"
 
-      if (storedEmail && storedRememberMe) {
-        setEmail(storedEmail)
-        setRememberMe(true)
-      }
+    if (storedEmail && storedRememberMe) {
+      setEmail(storedEmail)
+      setRememberMe(true)
     }
+  })
 
-    checkStoredCredentials()
-  }, [])
-
-  // Validate email on blur
-  const handleEmailBlur = () => {
-    const { isValid, error } = validateEmail(email)
-    setEmailError(isValid ? null : error)
-  }
-
-  // Validate password on blur
-  const handlePasswordBlur = () => {
-    if (!password) {
-      setPasswordError("Password is required")
-    } else {
-      setPasswordError(null)
-    }
-  }
-
-  // Handle form submission
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
-
-    // Reset errors
-    setEmailError(null)
-    setPasswordError(null)
-    setFormError(null)
-
-    // Validate form
-    const emailValidation = validateEmail(email)
-    if (!emailValidation.isValid) {
-      setEmailError(emailValidation.error)
-      return
-    }
-
-    if (!password) {
-      setPasswordError("Password is required")
-      return
-    }
-
     setIsLoading(true)
 
     try {
@@ -96,43 +43,13 @@ export function LoginForm() {
         localStorage.removeItem("kohlawise_remember_me")
       }
 
-      // Sign in with Supabase
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      })
-
-      if (error) {
-        // For demo purposes, we'll still allow login
-        console.log("Login error, proceeding to dashboard anyway:", error.message)
-
-        toast({
-          title: "Welcome back!",
-          description: "You've been logged in successfully.",
-        })
-
+      // For demo purposes, just redirect to dashboard
+      setTimeout(() => {
         router.push("/dashboard")
         router.refresh()
-        return
-      }
-
-      toast({
-        title: "Welcome back!",
-        description: "You've been logged in successfully.",
-      })
-
-      // Redirect to dashboard
-      router.push("/dashboard")
-      router.refresh()
-    } catch (error: any) {
-      console.error("Login error:", error)
-      setFormError("An unexpected error occurred. Please try again.")
-
-      toast({
-        variant: "destructive",
-        title: "Login failed",
-        description: "An unexpected error occurred. Please try again.",
-      })
+      }, 1000)
+    } catch (err) {
+      console.error("Unexpected error during login:", err)
     } finally {
       setIsLoading(false)
     }
@@ -141,29 +58,11 @@ export function LoginForm() {
   // Function to use demo login
   const handleDemoLogin = () => {
     setIsLoading(true)
-
-    // Store demo user data for persistence
-    localStorage.setItem("kohlawise_demo_user", "true")
-
-    toast({
-      title: "Demo mode activated",
-      description: "You're now using Kohlawise in demo mode.",
-    })
-
     // Simulate login delay
     setTimeout(() => {
       router.push("/dashboard")
       router.refresh()
     }, 1000)
-  }
-
-  // Handle social login errors
-  const handleSocialLoginError = (error: string) => {
-    toast({
-      variant: "destructive",
-      title: "Login failed",
-      description: error,
-    })
   }
 
   return (
@@ -175,48 +74,32 @@ export function LoginForm() {
     >
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="email" className="flex items-center justify-between">
-            Email
-            {emailError && (
-              <span className="text-xs font-normal text-destructive flex items-center">
-                <AlertCircle className="h-3 w-3 mr-1" /> {emailError}
-              </span>
-            )}
-          </Label>
+          <Label htmlFor="email">Email</Label>
           <div className="relative">
             <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
             <Input
               id="email"
               type="email"
               placeholder="name@example.com"
-              className={cn("pl-10", emailError && "border-destructive")}
+              className="pl-10"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              onBlur={handleEmailBlur}
               required
             />
           </div>
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="password" className="flex items-center justify-between">
-            Password
-            {passwordError && (
-              <span className="text-xs font-normal text-destructive flex items-center">
-                <AlertCircle className="h-3 w-3 mr-1" /> {passwordError}
-              </span>
-            )}
-          </Label>
+          <Label htmlFor="password">Password</Label>
           <div className="relative">
             <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
             <Input
               id="password"
               type={showPassword ? "text" : "password"}
               placeholder="••••••••"
-              className={cn("pl-10", passwordError && "border-destructive")}
+              className="pl-10"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              onBlur={handlePasswordBlur}
               required
             />
             <Button
@@ -251,35 +134,9 @@ export function LoginForm() {
           </Link>
         </div>
 
-        {formError && (
-          <div className="rounded-md bg-destructive/15 p-3">
-            <div className="flex items-center">
-              <AlertCircle className="h-4 w-4 text-destructive mr-2" />
-              <p className="text-sm font-medium text-destructive">{formError}</p>
-            </div>
-          </div>
-        )}
-
         <Button type="submit" className="w-full" disabled={isLoading}>
-          {isLoading ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Signing in...
-            </>
-          ) : (
-            "Sign in"
-          )}
+          {isLoading ? "Signing in..." : "Sign in"}
         </Button>
-
-        <div className="relative my-4">
-          <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t" />
-          </div>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
-          </div>
-        </div>
-
-        <SocialLoginButtons onError={handleSocialLoginError} />
 
         <div className="relative my-4">
           <div className="absolute inset-0 flex items-center">
@@ -296,9 +153,4 @@ export function LoginForm() {
       </form>
     </motion.div>
   )
-}
-
-// Helper function to conditionally join class names
-function cn(...classes: (string | boolean | undefined)[]) {
-  return classes.filter(Boolean).join(" ")
 }

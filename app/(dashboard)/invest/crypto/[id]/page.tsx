@@ -145,7 +145,7 @@ export default function CryptoDetailPage({ params }: { params: { id: string } })
                   <CardDescription>
                     <div className="flex items-center mt-1">
                       <span className="text-3xl font-bold">${formatCryptoPrice(crypto.price_usd)}</span>
-                      <span className={`ml-2 flex items-center ${isPriceUp ? "text-blue-500" : "text-red-500"}`}>
+                      <span className={`ml-2 flex items-center ${isPriceUp ? "text-green-600" : "text-red-600"}`}>
                         {isPriceUp ? (
                           <TrendingUp className="h-4 w-4 mr-1" />
                         ) : (
@@ -172,17 +172,27 @@ export default function CryptoDetailPage({ params }: { params: { id: string } })
                 </div>
                 <div className="space-y-1">
                   <div className="text-sm text-muted-foreground">24h Volume</div>
-                  <div className="font-medium">${new Intl.NumberFormat("en-US").format(crypto.volume24)}</div>
+                  <div className="font-medium">
+                    $
+                    {new Intl.NumberFormat("en-US", {
+                      notation: "compact",
+                      maximumFractionDigits: 2,
+                    }).format(crypto.volume24)}
+                  </div>
                 </div>
                 <div className="space-y-1">
                   <div className="text-sm text-muted-foreground">Circulating Supply</div>
                   <div className="font-medium">
-                    {new Intl.NumberFormat("en-US").format(Number.parseFloat(crypto.csupply))} {crypto.symbol}
+                    {new Intl.NumberFormat("en-US", {
+                      notation: "compact",
+                      maximumFractionDigits: 2,
+                    }).format(Number.parseFloat(crypto.csupply))}{" "}
+                    {crypto.symbol}
                   </div>
                 </div>
                 <div className="space-y-1">
                   <div className="text-sm text-muted-foreground">BTC Price</div>
-                  <div className="font-medium">{crypto.price_btc} BTC</div>
+                  <div className="font-medium">{Number.parseFloat(crypto.price_btc).toFixed(8)} BTC</div>
                 </div>
               </div>
             </CardContent>

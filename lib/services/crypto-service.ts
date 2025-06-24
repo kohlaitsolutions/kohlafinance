@@ -1,4 +1,8 @@
-// Types for Coinlore API responses
+// ───────────────────────────────────────────────────────────
+// Crypto helpers  +  safe Ethereum provider guard (no re-define)
+// ───────────────────────────────────────────────────────────
+
+/* ---------- Types --------------------------------------------------------- */
 export interface CryptoTicker {
   id: string
   symbol: string
@@ -26,69 +30,63 @@ export interface CryptoApiResponse {
   }
 }
 
-// Fetch cryptocurrency data from Coinlore API
+/* ---------- Fetch helpers ------------------------------------------------- */
+const API_BASE = "https://api.coinlore.net/api"
+
 export async function fetchCryptocurrencies(start = 0, limit = 20): Promise<CryptoTicker[]> {
   try {
-    const response = await fetch(`https://api.coinlore.net/api/tickers/?start=${start}&limit=${limit}`)
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch cryptocurrency data: ${response.status}`)
-    }
-
-    const data: CryptoApiResponse = await response.json()
+    const res = await fetch(`${API_BASE}/tickers/?start=${start}&limit=${limit}`)
+    if (!res.ok) throw new Error(`Failed to fetch cryptocurrency data: ${res.status}`)
+    const data: CryptoApiResponse = await res.json()
     return data.data
-  } catch (error) {
-    console.error("Error fetching cryptocurrency data:", error)
+  } catch (err) {
+    console.error("Error fetching cryptocurrency data:", err)
     return []
   }
 }
 
-// Fetch a single cryptocurrency by ID
 export async function fetchCryptocurrencyById(id: string): Promise<CryptoTicker | null> {
   try {
-    const response = await fetch(`https://api.coinlore.net/api/ticker/?id=${id}`)
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch cryptocurrency data: ${response.status}`)
-    }
-
-    const data = await response.json()
-    return data[0] || null
-  } catch (error) {
-    console.error(`Error fetching cryptocurrency with ID ${id}:`, error)
+    const res = await fetch(`${API_BASE}/ticker/?id=${id}`)
+    if (!res.ok) throw new Error(`Failed to fetch cryptocurrency data: ${res.status}`)
+    const data = await res.json()
+    return data[0] ?? null
+  } catch (err) {
+    console.error(`Error fetching cryptocurrency with ID ${id}:`, err)
     return null
   }
 }
 
-// Format cryptocurrency price with appropriate precision
+/* ---------- Formatting helpers ------------------------------------------- */
 export function formatCryptoPrice(price: string): string {
-  const numPrice = Number.parseFloat(price)
-
-  if (numPrice < 0.01) {
-    return numPrice.toFixed(6)
-  } else if (numPrice < 1) {
-    return numPrice.toFixed(4)
-  } else if (numPrice < 1000) {
-    return numPrice.toFixed(2)
-  } else {
-    return new Intl.NumberFormat("en-US", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(numPrice)
-  }
+  const num = Number.parseFloat(price)
+  if (num < 0.01) return num.toFixed(6)
+  if (num < 1) return num.toFixed(4)
+  if (num < 1000) return num.toFixed(2)
+  return new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(num)
 }
 
-// Format market cap with appropriate abbreviation
 export function formatMarketCap(marketCap: string): string {
-  const numMarketCap = Number.parseFloat(marketCap)
+  const num = Number.parseFloat(marketCap)
+  if (num >= 1_000_000_000) return `$${(num / 1_000_000_000).toFixed(2)}B`
+  if (num >= 1_000_000) return `$${(num / 1_000_000).toFixed(2)}M`
+  if (num >= 1_000) return `$${(num / 1_000).toFixed(2)}K`
+  return `$${num.toFixed(2)}`
+}
 
-  if (numMarketCap >= 1_000_000_000) {
-    return `$${(numMarketCap / 1_000_000_000).toFixed(2)}B`
-  } else if (numMarketCap >= 1_000_000) {
-    return `$${(numMarketCap / 1_000_000).toFixed(2)}M`
-  } else if (numMarketCap >= 1_000) {
-    return `$${(numMarketCap / 1_000).toFixed(2)}K`
-  } else {
-    return `$${numMarketCap.toFixed(2)}`
-  }
+/* ---------- Ethereum guard ------------------------------------------------ */
+/**
+ * Safely attaches a provider to `window.ethereum` without throwing
+ * “Cannot redefine property: ethereum” when a wallet has already injected one.
+ */
+export function ensureEthereumProvider(provider: unknown) {
+  if (typeof window === "undefined") return
+  if ("ethereum" in window) return (window as any).ethereum
+  Object.defineProperty(window, "ethereum", {
+    value: provider,
+    writable: false,
+    enumerable: false,
+    configurable: false,
+  })
+  return provider
 }

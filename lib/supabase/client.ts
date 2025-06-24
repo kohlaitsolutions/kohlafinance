@@ -1,23 +1,14 @@
-import { createBrowserClient } from "@supabase/ssr"
-
-let supabaseClient: ReturnType<typeof createBrowserClient> | undefined
-
+/**
+ * 🚧  Supabase has been removed from Kohlawise.
+ * This tiny shim keeps legacy imports from crashing the build.
+ * It always returns `null` and logs a warn once in development.
+ */
+let warned = false
 export function getSupabaseBrowserClient() {
-  if (!supabaseClient) {
-    supabaseClient = createBrowserClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        auth: {
-          autoRefreshToken: true,
-          persistSession: true,
-          detectSessionInUrl: false,
-        },
-        global: {
-          fetch: (...args) => fetch(...args),
-        },
-      },
-    )
+  if (process.env.NODE_ENV !== "production" && !warned) {
+    // eslint-disable-next-line no-console
+    console.warn("[kohlawise] Supabase browser client requested but Supabase is disabled.")
+    warned = true
   }
-  return supabaseClient
+  return null
 }

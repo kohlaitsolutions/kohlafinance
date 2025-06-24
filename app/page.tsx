@@ -9,16 +9,12 @@ export default function Home() {
   const router = useRouter()
 
   useEffect(() => {
-    // Simple timeout to show the loading animation briefly before redirecting
-    const redirectTimer = setTimeout(() => {
-      router.push("/dashboard")
-    }, 1500) // 1.5 seconds delay for the animation
-
-    return () => clearTimeout(redirectTimer)
+    // Immediate redirect to dashboard
+    router.replace("/dashboard")
   }, [router])
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-primary/20 via-background to-primary/10 parallax-bg">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-primary/20 via-background to-primary/10">
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center">
         <motion.div
           initial={{ y: -20 }}
@@ -40,7 +36,7 @@ export default function Home() {
           transition={{ delay: 0.2, duration: 0.8 }}
           className="text-xl text-muted-foreground mb-8"
         >
-          Your modern financial companion
+          Redirecting to your dashboard...
         </motion.p>
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </motion.div>

@@ -68,17 +68,3 @@ export type UserSettings = {
   created_at: string
   updated_at: string
 }
-
-// Demo data types for universal access
-export type DemoUser = {
-  id: string
-  name: string
-  email: string
-}
-
-export type DemoAccount = {
-  id: string
-  name: string
-  balance: number
-  type: string
-}

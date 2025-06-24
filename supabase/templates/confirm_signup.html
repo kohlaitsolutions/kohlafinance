@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Kohlawise - Verify Your Email</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8fafc;
+        }
+        .container {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: #1e40af;
+            margin-bottom: 10px;
+        }
+        .title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #6b7280;
+            font-size: 16px;
+        }
+        .content {
+            margin: 30px 0;
+        }
+        .button {
+            display: inline-block;
+            background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+            color: white;
+            padding: 14px 28px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            margin: 20px 0;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+        .button:hover {
+            transform: translateY(-1px);
+        }
+        .features {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .feature {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+        .feature-icon {
+            width: 20px;
+            height: 20px;
+            background: #10b981;
+            border-radius: 50%;
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
+            color: #6b7280;
+            font-size: 14px;
+        }
+        .security-note {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            border-radius: 6px;
+            padding: 12px;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">💰 Kohlawise</div>
+            <h1 class="title">Welcome to Your Financial Future!</h1>
+            <p class="subtitle">Please verify your email to get started</p>
+        </div>
+
+        <div class="content">
+            <p>Hi there! 👋</p>
+            
+            <p>Welcome to Kohlawise, your intelligent financial management platform. We're excited to help you take control of your finances and achieve your financial goals.</p>
+
+            <p>To get started, please verify your email address by clicking the button below:</p>
+
+            <div style="text-align: center;">
+                <a href="{{ .ConfirmationURL }}" class="button">
+                    ✅ Verify Email Address
+                </a>
+            </div>
+
+            <div class="features">
+                <h3 style="margin-top: 0; color: #1f2937;">What you'll get with Kohlawise:</h3>
+                <div class="feature">
+                    <div class="feature-icon">💳</div>
+                    <span>Smart expense tracking and categorization</span>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">📊</div>
+                    <span>Detailed financial analytics and insights</span>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🎯</div>
+                    <span>Goal setting and progress tracking</span>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🔒</div>
+                    <span>Bank-level security and encryption</span>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">📱</div>
+                    <span>Mobile-first design for on-the-go access</span>
+                </div>
+            </div>
+
+            <div class="security-note">
+                <strong>🔐 Security Note:</strong> This verification link will expire in 24 hours. If you didn't create an account with Kohlawise, please ignore this email.
+            </div>
+
+            <p>If the button doesn't work, you can copy and paste this link into your browser:</p>
+            <p style="word-break: break-all; color: #3b82f6;">{{ .ConfirmationURL }}</p>
+        </div>
+
+        <div class="footer">
+            <p>Need help? Contact our support team at <a href="mailto:support@kohlawise.com" style="color: #3b82f6;">support@kohlawise.com</a></p>
+            <p>© 2024 Kohlawise. All rights reserved.</p>
+            <p style="font-size: 12px; margin-top: 10px;">
+                This email was sent to {{ .Email }}. If you no longer wish to receive these emails, 
+                you can <a href="#" style="color: #6b7280;">unsubscribe here</a>.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

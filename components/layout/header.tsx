@@ -1,11 +1,26 @@
 "use client"
 
 import type React from "react"
+
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
-import { Bell, CreditCard, Home, Moon, Search, Settings, Sun, TrendingUp, User, Wallet, X } from "lucide-react"
+import {
+  Bell,
+  CreditCard,
+  Home,
+  LogIn,
+  LogOut,
+  Moon,
+  Search,
+  Settings,
+  Sun,
+  TrendingUp,
+  User,
+  Wallet,
+  X,
+} from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -17,6 +32,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
+import { getSupabaseBrowserClient } from "@/lib/supabase/client"
 import { useTheme } from "next-themes"
 import type { Notification } from "@/lib/types"
 
@@ -32,14 +48,21 @@ type SearchResult = {
   href: string
 }
 
-export function Header({ notifications, isAuthenticated = true }: HeaderProps) {
+export function Header({ notifications, isAuthenticated = false }: HeaderProps) {
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
   const [searchResults, setSearchResults] = useState<SearchResult[]>([])
   const router = useRouter()
+  const supabase = getSupabaseBrowserClient()
   const { theme, setTheme } = useTheme()
 
   const unreadNotifications = notifications.filter((notification) => !notification.is_read)
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut()
+    router.push("/login")
+    router.refresh()
+  }
 
   // Search functionality
   useEffect(() => {
@@ -204,7 +227,7 @@ export function Header({ notifications, isAuthenticated = true }: HeaderProps) {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {/* User menu */}
+          {/* User menu with sign in/out options */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="relative">
@@ -213,14 +236,32 @@ export function Header({ notifications, isAuthenticated = true }: HeaderProps) {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Demo Account</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem asChild>
-                <Link href="/account">Profile</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/settings">Settings</Link>
-              </DropdownMenuItem>
+              {isAuthenticated ? (
+                <>
+                  <DropdownMenuLabel>Account</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link href="/account">Profile</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/settings">Settings</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleSignOut}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Sign out
+                  </DropdownMenuItem>
+                </>
+              ) : (
+                <>
+                  <DropdownMenuItem asChild>
+                    <Link href="/login">
+                      <LogIn className="mr-2 h-4 w-4" />
+                      Sign in
+                    </Link>
+                  </DropdownMenuItem>
+                </>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

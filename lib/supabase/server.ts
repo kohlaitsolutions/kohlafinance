@@ -1,13 +1,20 @@
-/**
- * 🚧  Supabase has been removed from Kohlawise.
- * This stub satisfies existing imports during the transition period.
- */
-let warned = false
+import { createServerClient } from "@supabase/ssr"
+import { cookies } from "next/headers"
+
 export function getSupabaseServerClient() {
-  if (process.env.NODE_ENV !== "production" && !warned) {
-    // eslint-disable-next-line no-console
-    console.warn("[kohlawise] Supabase server client requested but Supabase is disabled.")
-    warned = true
-  }
-  return null
+  const cookieStore = cookies()
+
+  return createServerClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, {
+    cookies: {
+      get(name: string) {
+        return cookieStore.get(name)?.value
+      },
+      set(name: string, value: string, options: any) {
+        cookieStore.set({ name, value, ...options })
+      },
+      remove(name: string, options: any) {
+        cookieStore.set({ name, value: "", ...options })
+      },
+    },
+  })
 }

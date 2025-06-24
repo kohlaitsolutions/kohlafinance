@@ -19,7 +19,6 @@ import {
   formatMarketCap,
   type CryptoTicker,
 } from "@/lib/services/crypto-service"
-import { CryptoFormatterTest } from "@/components/test/crypto-formatter-test"
 
 const stocksData = [
   { name: "Apple Inc.", symbol: "AAPL", price: 182.63, change: 1.25, changePercent: 0.69 },
@@ -184,10 +183,7 @@ export default function InvestPage() {
         </TabsList>
 
         <TabsContent value="portfolio" className="mt-6">
-          <div className="space-y-6">
-            <CryptoFormatterTest />
-            <CryptoPortfolio />
-          </div>
+          <CryptoPortfolio />
         </TabsContent>
 
         <TabsContent value="stocks" className="mt-6">
@@ -248,13 +244,6 @@ export default function InvestPage() {
                 <div className="flex items-center justify-center py-8">
                   <Loader2 className="h-8 w-8 animate-spin text-primary" />
                 </div>
-              ) : cryptoData.length === 0 ? (
-                <div className="text-center py-8">
-                  <p className="text-muted-foreground">No cryptocurrency data available. Please try refreshing.</p>
-                  <Button onClick={refreshCryptoData} className="mt-4">
-                    Refresh Data
-                  </Button>
-                </div>
               ) : (
                 <div className="rounded-md border">
                   <div className="grid grid-cols-12 border-b bg-muted/50 p-3 text-sm font-medium">
@@ -266,10 +255,7 @@ export default function InvestPage() {
                   </div>
                   <div className="divide-y">
                     {cryptoData.map((crypto) => (
-                      <div
-                        key={crypto.id}
-                        className="grid grid-cols-12 items-center p-3 hover:bg-muted/50 transition-colors"
-                      >
+                      <div key={crypto.id} className="grid grid-cols-12 items-center p-3">
                         <div className="col-span-4">
                           <div className="font-medium">{crypto.name}</div>
                           <div className="text-sm text-muted-foreground">{crypto.symbol}</div>
@@ -278,7 +264,7 @@ export default function InvestPage() {
                         <div className="col-span-2 text-right">
                           <span
                             className={
-                              Number.parseFloat(crypto.percent_change_24h) >= 0 ? "text-green-600" : "text-red-600"
+                              Number.parseFloat(crypto.percent_change_24h) >= 0 ? "text-blue-500" : "text-red-500"
                             }
                           >
                             {crypto.percent_change_24h.startsWith("-") ? "" : "+"}

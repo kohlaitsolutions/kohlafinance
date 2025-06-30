@@ -1,141 +1,89 @@
-import { getSupabaseServerClient } from "@/lib/supabase/server"
+"use client"
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { formatCurrency, formatDate } from "@/lib/utils"
-import { ArrowDownLeft, ArrowUpRight, MoreVertical } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { ArrowDownLeft, ArrowUpRight, MoreVertical } from "lucide-react"
+import { formatCurrency, formatDate } from "@/lib/utils"
 
-export default async function TransactionsPage() {
-  const supabase = getSupabaseServerClient()
+/**
+ * Demo transactions shown to every visitor.
+ * Remove or replace with real data once a backend is available.
+ */
+const DEMO_TRANSACTIONS = [
+  {
+    id: "demo-tx-1",
+    transaction_type: "payment",
+    amount: 125.5,
+    description: "Monthly Subscription",
+    recipient_name: "Netflix",
+    category: "entertainment",
+    created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+  {
+    id: "demo-tx-2",
+    transaction_type: "payment",
+    amount: 45.99,
+    description: "Grocery Shopping",
+    recipient_name: "Whole Foods",
+    category: "groceries",
+    created_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+  {
+    id: "demo-tx-3",
+    transaction_type: "deposit",
+    amount: 2500,
+    description: "Salary Deposit",
+    recipient_name: null,
+    category: "income",
+    created_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+  {
+    id: "demo-tx-4",
+    transaction_type: "payment",
+    amount: 89.99,
+    description: "Phone Bill",
+    recipient_name: "Verizon",
+    category: "utilities",
+    created_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+  {
+    id: "demo-tx-5",
+    transaction_type: "payment",
+    amount: 35.75,
+    description: "Dinner",
+    recipient_name: "Olive Garden",
+    category: "dining",
+    created_at: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+]
 
-  // Try to get the session, but don't redirect if it fails
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
-
-  // Use demo data if no session is available
-  let transactions = []
-
-  if (session?.user?.id) {
-    try {
-      // Get user accounts
-      const { data: accounts, error: accountsError } = await supabase
-        .from("accounts")
-        .select("*")
-        .eq("user_id", session.user.id)
-
-      if (!accountsError && accounts && accounts.length > 0) {
-        // Get all transactions
-        const { data: userTransactions, error: transactionsError } = await supabase
-          .from("transactions")
-          .select("*")
-          .in(
-            "account_id",
-            accounts.map((account) => account.id),
-          )
-          .order("created_at", { ascending: false })
-
-        if (!transactionsError && userTransactions) {
-          transactions = userTransactions
-        }
-      }
-    } catch (err) {
-      console.error("Error fetching transactions:", err)
-      // Continue with demo data
-    }
+/** Tailwind background classes for each spending category */
+function getCategoryColor(category: string | null | undefined) {
+  switch (category?.toLowerCase()) {
+    case "entertainment":
+      return "bg-purple-100"
+    case "groceries":
+      return "bg-blue-100"
+    case "utilities":
+      return "bg-yellow-100"
+    case "dining":
+      return "bg-orange-100"
+    case "income":
+      return "bg-primary/10"
+    default:
+      return "bg-gray-100"
   }
+}
 
-  // If no real transactions, use demo data
-  if (transactions.length === 0) {
-    transactions = [
-      {
-        id: "demo-tx-1",
-        account_id: "demo-1",
-        transaction_type: "payment",
-        amount: 125.5,
-        description: "Monthly Subscription",
-        recipient_name: "Netflix",
-        recipient_account: "9876543210",
-        status: "completed",
-        category: "entertainment",
-        created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-      },
-      {
-        id: "demo-tx-2",
-        account_id: "demo-1",
-        transaction_type: "payment",
-        amount: 45.99,
-        description: "Grocery Shopping",
-        recipient_name: "Whole Foods",
-        recipient_account: "5432109876",
-        status: "completed",
-        category: "groceries",
-        created_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-      },
-      {
-        id: "demo-tx-3",
-        account_id: "demo-1",
-        transaction_type: "deposit",
-        amount: 2500.0,
-        description: "Salary Deposit",
-        recipient_name: null,
-        recipient_account: null,
-        status: "completed",
-        category: "income",
-        created_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-      },
-      {
-        id: "demo-tx-4",
-        account_id: "demo-1",
-        transaction_type: "payment",
-        amount: 89.99,
-        description: "Phone Bill",
-        recipient_name: "Verizon",
-        recipient_account: "1122334455",
-        status: "completed",
-        category: "utilities",
-        created_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
-      },
-      {
-        id: "demo-tx-5",
-        account_id: "demo-1",
-        transaction_type: "payment",
-        amount: 35.75,
-        description: "Dinner",
-        recipient_name: "Olive Garden",
-        recipient_account: "5566778899",
-        status: "completed",
-        category: "dining",
-        created_at: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000).toISOString(),
-      },
-    ]
-  }
-
-  // Function to get category color
-  const getCategoryColor = (category: string | null) => {
-    if (!category) return "bg-gray-100"
-
-    switch (category.toLowerCase()) {
-      case "entertainment":
-        return "bg-purple-100"
-      case "groceries":
-        return "bg-blue-100"
-      case "utilities":
-        return "bg-yellow-100"
-      case "dining":
-        return "bg-orange-100"
-      case "income":
-        return "bg-primary/10"
-      default:
-        return "bg-gray-100"
-    }
-  }
+export default function TransactionsPage() {
+  const transactions = DEMO_TRANSACTIONS
 
   return (
     <div className="space-y-6">
-      <div>
+      <header>
         <h1 className="text-3xl font-bold tracking-tight">Transactions</h1>
-        <p className="text-muted-foreground">View all your transaction history</p>
-      </div>
+        <p className="text-muted-foreground">View your recent transaction history</p>
+      </header>
 
       <Card className="border-0 shadow-md">
         <CardHeader className="flex flex-row items-center justify-between">
@@ -149,55 +97,52 @@ export default async function TransactionsPage() {
             </Button>
           </div>
         </CardHeader>
+
         <CardContent className="p-0">
-          <div className="space-y-1">
-            {transactions.map((transaction) => (
-              <div
-                key={transaction.id}
+          <ul className="space-y-1">
+            {transactions.map((tx) => (
+              <li
+                key={tx.id}
                 className="flex items-center justify-between border-b p-4 last:border-0 hover:bg-muted/50 transition-colors"
               >
                 <div className="flex items-center gap-4">
                   <div
-                    className={`flex h-10 w-10 items-center justify-center rounded-full ${getCategoryColor(transaction.category)}`}
+                    className={`flex h-10 w-10 items-center justify-center rounded-full ${getCategoryColor(
+                      tx.category,
+                    )}`}
                   >
-                    {transaction.transaction_type === "deposit" ? (
+                    {tx.transaction_type === "deposit" ? (
                       <ArrowDownLeft className="h-5 w-5 text-primary" />
                     ) : (
                       <ArrowUpRight className="h-5 w-5 text-red-500" />
                     )}
                   </div>
+
                   <div>
                     <div className="font-medium">
-                      {transaction.description ||
-                        (transaction.transaction_type === "deposit"
-                          ? "Deposit"
-                          : transaction.recipient_name || "Payment")}
+                      {tx.description ||
+                        (tx.transaction_type === "deposit" ? "Deposit" : tx.recipient_name || "Payment")}
                     </div>
-                    <div className="text-sm text-muted-foreground">{formatDate(transaction.created_at)}</div>
+                    <div className="text-sm text-muted-foreground">{formatDate(tx.created_at)}</div>
                   </div>
                 </div>
+
                 <div className="flex items-center gap-4">
-                  <div
+                  <span
                     className={
-                      transaction.transaction_type === "deposit"
-                        ? "text-primary font-medium"
-                        : "text-red-500 font-medium"
+                      tx.transaction_type === "deposit" ? "text-primary font-medium" : "text-red-500 font-medium"
                     }
                   >
-                    {transaction.transaction_type === "deposit" ? "+" : "-"}
-                    {formatCurrency(transaction.amount)}
-                  </div>
-                  <Button variant="ghost" size="icon">
+                    {tx.transaction_type === "deposit" ? "+" : "-"}
+                    {formatCurrency(tx.amount)}
+                  </span>
+                  <Button variant="ghost" size="icon" aria-label="More actions">
                     <MoreVertical className="h-4 w-4" />
                   </Button>
                 </div>
-              </div>
+              </li>
             ))}
-
-            {transactions.length === 0 && (
-              <div className="p-4 text-center text-sm text-muted-foreground">No transactions found</div>
-            )}
-          </div>
+          </ul>
         </CardContent>
       </Card>
     </div>

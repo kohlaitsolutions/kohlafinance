@@ -2,6 +2,7 @@ import { AccountCard } from "@/components/dashboard/account-card"
 import { QuickActions } from "@/components/dashboard/quick-actions"
 import { TransactionList } from "@/components/dashboard/transaction-list"
 import { SpendingInsights } from "@/components/analytics/spending-insights"
+import { WelcomeCard } from "@/components/dashboard/welcome-card"
 
 export default function DashboardPage() {
   // Demo data for all users
@@ -93,12 +94,8 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Welcome, {userName}</h1>
-          <p className="text-muted-foreground">Here's an overview of your finances</p>
-        </div>
-      </div>
+      {/* Welcome Card */}
+      <WelcomeCard userName={userName} />
 
       <div className="grid gap-6 md:grid-cols-2">
         {accounts.map((account) => (

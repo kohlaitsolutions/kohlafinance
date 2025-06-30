@@ -38,7 +38,9 @@ export function AccountCard({
       <div className="flex justify-between items-start">
         <div>
           <h3 className="text-lg font-semibold">{accountName}</h3>
-          <div className="account-card-number mt-1">•••• {accountNumber.slice(-4)}</div>
+          <div className="account-card-number mt-1">
+            {accountNumber ? `•••• ${accountNumber.slice(-4)}` : "Account # unavailable"}
+          </div>
         </div>
         <button
           onClick={(e) => {

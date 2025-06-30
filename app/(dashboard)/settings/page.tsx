@@ -1,64 +1,25 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useState } from "react"
 import { motion } from "framer-motion"
-import { Loader2, Moon, Sun } from "lucide-react"
+import { Moon, Sun } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { getSupabaseBrowserClient } from "@/lib/supabase/client"
 import { updateUserSettings } from "@/app/actions"
 
 export default function SettingsPage() {
-  const [isLoading, setIsLoading] = useState(true)
-  const [settings, setSettings] = useState<any>(null)
-  const router = useRouter()
-  const supabase = getSupabaseBrowserClient()
-
-  useEffect(() => {
-    async function loadSettings() {
-      try {
-        const {
-          data: { session },
-        } = await supabase.auth.getSession()
-        if (!session) {
-          router.push("/login")
-          return
-        }
-
-        const { data } = await supabase.from("user_settings").select("*").eq("user_id", session.user.id).single()
-
-        setSettings(
-          data || {
-            theme: "system",
-            notification_preferences: {
-              email: true,
-              push: true,
-              sms: false,
-            },
-          },
-        )
-      } catch (error) {
-        console.error(error)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    loadSettings()
-  }, [router, supabase])
-
-  if (isLoading) {
-    return (
-      <div className="flex h-full items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    )
-  }
+  const [settings] = useState({
+    theme: "system",
+    notification_preferences: {
+      email: true,
+      push: true,
+      sms: false,
+    },
+  })
 
   return (
     <div className="space-y-6">

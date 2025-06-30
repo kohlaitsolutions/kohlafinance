@@ -13,20 +13,45 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { getSupabaseBrowserClient } from "@/lib/supabase/client"
 import { formatCurrency } from "@/lib/utils"
 import { makeTransaction } from "@/app/actions"
 import { sendMoneySchema } from "@/lib/validation"
 
 type FormValues = z.infer<typeof sendMoneySchema>
 
+// Demo accounts for all users
+const DEMO_ACCOUNTS = [
+  {
+    id: "demo-1",
+    user_id: "demo",
+    account_number: "1234567890",
+    account_name: "Default Checking",
+    balance: 5280.42,
+    account_type: "checking",
+    currency: "USD",
+    is_primary: true,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: "demo-2",
+    user_id: "demo",
+    account_number: "0987654321",
+    account_name: "Default Savings",
+    balance: 12750.89,
+    account_type: "savings",
+    currency: "USD",
+    is_primary: false,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+]
+
 export default function SendMoneyPage() {
-  const [accounts, setAccounts] = useState<any[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+  const [accounts] = useState(DEMO_ACCOUNTS)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
   const router = useRouter()
-  const supabase = getSupabaseBrowserClient()
 
   const form = useForm<FormValues>({
     resolver: zodResolver(sendMoneySchema),
@@ -34,58 +59,6 @@ export default function SendMoneyPage() {
       description: "",
     },
   })
-
-  useState(() => {
-    async function loadAccounts() {
-      try {
-        const {
-          data: { session },
-        } = await supabase.auth.getSession()
-
-        if (session?.user?.id) {
-          const { data, error } = await supabase.from("accounts").select("*").eq("user_id", session.user.id)
-
-          if (!error && data) {
-            setAccounts(data)
-          }
-        } else {
-          // Demo accounts
-          setAccounts([
-            {
-              id: "demo-1",
-              user_id: "demo",
-              account_number: "1234567890",
-              account_name: "Default Checking",
-              balance: 5280.42,
-              account_type: "checking",
-              currency: "USD",
-              is_primary: true,
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-            },
-            {
-              id: "demo-2",
-              user_id: "demo",
-              account_number: "0987654321",
-              account_name: "Default Savings",
-              balance: 12750.89,
-              account_type: "savings",
-              currency: "USD",
-              is_primary: false,
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-            },
-          ])
-        }
-      } catch (error) {
-        console.error("Error loading accounts:", error)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    loadAccounts()
-  }, [supabase])
 
   const selectedAccountId = form.watch("fromAccount")
   const selectedAccount = accounts.find((account) => account.id === selectedAccountId)
@@ -120,14 +93,6 @@ export default function SendMoneyPage() {
     } finally {
       setIsSubmitting(false)
     }
-  }
-
-  if (isLoading) {
-    return (
-      <div className="flex h-full items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    )
   }
 
   return (

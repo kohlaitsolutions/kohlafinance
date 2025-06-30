@@ -4,76 +4,52 @@
 
 @layer base {
   :root {
-    --background: 0 0% 10%;
-    --foreground: 0 0% 98%;
-    --card: 0 0% 15%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 15%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 330 100% 60%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 240 10% 20%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 240 10% 20%;
-    --muted-foreground: 240 5% 65%;
-    --accent: 142 71% 45%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 10% 20%;
-    --input: 240 10% 20%;
-    --ring: 330 100% 60%;
-    --radius: 1rem;
-    --positive: 142 71% 45%;
-    --negative: 0 84.2% 60.2%;
-  }
-
-  .light {
     --background: 0 0% 100%;
-    --foreground: 0 0% 10%;
-    --card: 0 0% 98%;
-    --card-foreground: 0 0% 10%;
-    --popover: 0 0% 98%;
-    --popover-foreground: 0 0% 10%;
-    --primary: 330 100% 60%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 240 5% 96%;
-    --secondary-foreground: 240 10% 20%;
-    --muted: 240 5% 96%;
-    --muted-foreground: 240 5% 65%;
-    --accent: 142 71% 45%;
-    --accent-foreground: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 221.2 83.2% 53.3%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222.2 84% 4.9%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 222.2 84% 4.9%;
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 5% 90%;
-    --input: 240 5% 90%;
-    --ring: 330 100% 60%;
-    --positive: 142 71% 45%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 221.2 83.2% 53.3%;
+    --radius: 0.75rem;
+    --positive: 142.1 76.2% 36.3%;
     --negative: 0 84.2% 60.2%;
   }
 
   .dark {
-    --background: 0 0% 10%;
-    --foreground: 0 0% 98%;
-    --card: 0 0% 15%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 15%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 330 100% 60%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 240 10% 20%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 240 10% 20%;
-    --muted-foreground: 240 5% 65%;
-    --accent: 142 71% 45%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 10% 20%;
-    --input: 240 10% 20%;
-    --ring: 330 100% 60%;
-    --positive: 142 71% 45%;
-    --negative: 0 84.2% 60.2%;
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 222.2 84% 4.9%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 224.3 76.3% 94.1%;
+    --positive: 142.1 70.6% 45.3%;
+    --negative: 0 62.8% 30.6%;
   }
 }
 
@@ -83,190 +59,142 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
 
-/* Glassmorphism effect */
-.glassmorphism {
-  background: rgba(25, 25, 25, 0.7);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+@layer components {
+  .account-card {
+    @apply relative overflow-hidden rounded-2xl p-6 text-white shadow-lg transition-all duration-300 hover:shadow-xl;
+  }
+
+  .account-card-number {
+    @apply text-sm font-mono opacity-80;
+  }
+
+  .account-card-balance {
+    @apply text-3xl font-bold;
+  }
+
+  .card-hover {
+    @apply transition-all duration-300 hover:scale-105 hover:shadow-2xl;
+  }
+
+  .insight-card {
+    @apply rounded-lg border bg-card p-4 shadow-sm transition-all duration-200 hover:shadow-md;
+  }
+
+  .insight-title {
+    @apply text-sm font-medium text-muted-foreground;
+  }
+
+  .insight-value {
+    @apply text-2xl font-bold;
+  }
+
+  .insight-description {
+    @apply text-xs text-muted-foreground;
+  }
+
+  .glass-morphism {
+    @apply backdrop-blur-md bg-white/10 border border-white/20 shadow-xl;
+  }
+
+  .gradient-text {
+    @apply bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent;
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .animate-pulse-slow {
+    animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
 }
 
-.light .glassmorphism {
-  background: rgba(255, 255, 255, 0.7);
-  border: 1px solid rgba(0, 0, 0, 0.1);
-}
-
-/* Parallax scrolling */
-.parallax-bg {
-  background-attachment: fixed;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
-}
-
-/* Animation utilities */
 @keyframes float {
-  0% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
+  0%,
   100% {
     transform: translateY(0px);
   }
+  50% {
+    transform: translateY(-20px);
+  }
 }
 
-.animate-float {
-  animation: float 3s ease-in-out infinite;
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
 }
 
-/* Card hover effects */
-.card-hover {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
 }
 
-.card-hover:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--primary));
+  border-radius: 3px;
 }
 
-.light .card-hover:hover {
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--primary) / 0.8);
 }
 
-/* Modern gradient backgrounds */
-.bg-gradient-modern {
-  background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.8) 100%);
+/* Loading animations */
+.skeleton {
+  @apply animate-pulse bg-muted;
 }
 
-.bg-gradient-card {
-  background: linear-gradient(135deg, hsl(330 100% 60%) 0%, hsl(280 100% 60%) 100%);
+/* Focus styles */
+.focus-ring {
+  @apply focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2;
 }
 
-.bg-gradient-card-green {
-  background: linear-gradient(135deg, hsl(142 71% 45%) 0%, hsl(160 71% 45%) 100%);
+/* Button variants */
+.btn-gradient {
+  @apply bg-gradient-to-r from-primary to-accent text-white shadow-lg hover:shadow-xl transition-all duration-300;
 }
 
-.bg-gradient-card-blue {
-  background: linear-gradient(135deg, hsl(220 100% 60%) 0%, hsl(250 100% 60%) 100%);
+/* Card animations */
+.card-enter {
+  animation: cardEnter 0.3s ease-out;
 }
 
-.bg-gradient-subtle {
-  background: linear-gradient(135deg, hsl(var(--primary) / 0.1) 0%, hsl(var(--primary) / 0.05) 100%);
+@keyframes cardEnter {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
-/* Account card styles */
-.account-card {
-  border-radius: var(--radius);
-  padding: 1.5rem;
-  position: relative;
-  overflow: hidden;
-  color: white;
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .account-card {
+    @apply p-4;
+  }
+
+  .account-card-balance {
+    @apply text-2xl;
+  }
 }
 
-.account-card-number {
-  font-size: 0.875rem;
-  opacity: 0.8;
-}
-
-.account-card-balance {
-  font-size: 1.75rem;
-  font-weight: bold;
-  margin: 0.5rem 0;
-}
-
-/* Transaction list styles */
-.transaction-item {
-  display: flex;
-  align-items: center;
-  padding: 1rem;
-  border-bottom: 1px solid hsl(var(--border));
-}
-
-.transaction-icon {
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-right: 1rem;
-}
-
-.transaction-details {
-  flex: 1;
-}
-
-.transaction-amount {
-  font-weight: bold;
-}
-
-/* Mobile banking style navigation */
-.mobile-nav {
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background-color: hsl(var(--background));
-  padding: 0.75rem 0;
-  border-top: 1px solid hsl(var(--border));
-  z-index: 50;
-}
-
-.mobile-nav-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  font-size: 0.75rem;
-}
-
-.mobile-nav-icon {
-  margin-bottom: 0.25rem;
-}
-
-/* Progress bar styles */
-.progress-bar {
-  height: 8px;
-  border-radius: 4px;
-  background-color: hsl(var(--muted));
-  overflow: hidden;
-}
-
-.progress-bar-fill {
-  height: 100%;
-  border-radius: 4px;
-  background-color: hsl(var(--primary));
-}
-
-/* Spending insights styles */
-.insight-card {
-  border-radius: var(--radius);
-  padding: 1.25rem;
-  background-color: hsl(var(--card));
-  margin-bottom: 1rem;
-}
-
-.insight-title {
-  font-size: 1rem;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-}
-
-.insight-value {
-  font-size: 1.5rem;
-  font-weight: 700;
-  margin-bottom: 0.5rem;
-}
-
-.insight-description {
-  font-size: 0.875rem;
-  color: hsl(var(--muted-foreground));
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
 }

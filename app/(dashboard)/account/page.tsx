@@ -1,54 +1,21 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useState } from "react"
 import { motion } from "framer-motion"
-import { Loader2, User } from "lucide-react"
+import { User } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { getSupabaseBrowserClient } from "@/lib/supabase/client"
 import { updateUserProfile } from "@/app/actions"
 
 export default function AccountPage() {
-  const [isLoading, setIsLoading] = useState(true)
-  const [userData, setUserData] = useState<any>(null)
-  const router = useRouter()
-  const supabase = getSupabaseBrowserClient()
-
-  useEffect(() => {
-    async function loadUserData() {
-      try {
-        const {
-          data: { session },
-        } = await supabase.auth.getSession()
-        if (!session) {
-          router.push("/login")
-          return
-        }
-
-        const { data } = await supabase.from("users").select("*").eq("id", session.user.id).single()
-
-        setUserData(data)
-      } catch (error) {
-        console.error(error)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    loadUserData()
-  }, [router, supabase])
-
-  if (isLoading) {
-    return (
-      <div className="flex h-full items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    )
-  }
+  const [userData] = useState({
+    first_name: "Demo",
+    last_name: "User",
+    email: "demo@kohlawise.com",
+  })
 
   return (
     <div className="space-y-6">

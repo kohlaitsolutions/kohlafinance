@@ -2,98 +2,180 @@
 
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
+import { z } from "zod"
+import { transferSchema, profileUpdateSchema } from "@/lib/validation"
 
-// Demo actions that simulate functionality without database
-export async function createAccount(formData: FormData) {
-  const accountName = formData.get("accountName") as string
-  const accountType = formData.get("accountType") as string
-  const currency = formData.get("currency") as string
-  const initialDeposit = Number.parseFloat(formData.get("initialDeposit") as string) || 0
+// Demo data store (in production, this would be a database)
+const demoTransactions: any[] = []
+const demoUsers = new Map()
 
-  // Simulate account creation
-  console.log("Creating account:", { accountName, accountType, currency, initialDeposit })
+export async function makeTransaction(formData: FormData) {
+  try {
+    const data = {
+      fromAccount: formData.get("fromAccount") as string,
+      toAccount: formData.get("toAccount") as string,
+      recipientName: formData.get("recipientName") as string,
+      amount: Number.parseFloat(formData.get("amount") as string),
+      description: (formData.get("description") as string) || "",
+    }
 
-  // Simulate delay
-  await new Promise((resolve) => setTimeout(resolve, 1000))
+    // Validate the data
+    const validatedData = transferSchema.parse(data)
 
-  revalidatePath("/dashboard")
-  redirect("/dashboard")
-}
+    // Create demo transaction
+    const transaction = {
+      id: `tx_${Date.now()}`,
+      account_id: validatedData.fromAccount,
+      transaction_type: "payment",
+      amount: validatedData.amount,
+      description: validatedData.description,
+      recipient_name: validatedData.recipientName,
+      recipient_account: validatedData.toAccount,
+      status: "completed",
+      category: "transfer",
+      created_at: new Date().toISOString(),
+    }
 
-export async function createCard(formData: FormData) {
-  const accountId = formData.get("accountId") as string
-  const cardType = formData.get("cardType") as string
+    demoTransactions.push(transaction)
 
-  // Simulate card creation
-  console.log("Creating card:", { accountId, cardType })
+    revalidatePath("/dashboard")
+    revalidatePath("/transactions")
 
-  // Simulate delay
-  await new Promise((resolve) => setTimeout(resolve, 1000))
+    return { success: true, transaction }
+  } catch (error) {
+    console.error("Transaction error:", error)
 
-  revalidatePath("/account")
-  redirect("/account")
+    if (error instanceof z.ZodError) {
+      return {
+        success: false,
+        error: "Validation failed",
+        details: error.errors,
+      }
+    }
+
+    return {
+      success: false,
+      error: "Transaction failed. Please try again.",
+    }
+  }
 }
 
 export async function updateUserProfile(formData: FormData) {
-  const firstName = formData.get("firstName") as string
-  const lastName = formData.get("lastName") as string
-  const email = formData.get("email") as string
+  try {
+    const data = {
+      firstName: formData.get("firstName") as string,
+      lastName: formData.get("lastName") as string,
+      email: formData.get("email") as string,
+      phone: (formData.get("phone") as string) || "",
+      dateOfBirth: (formData.get("dateOfBirth") as string) || "",
+      address: (formData.get("address") as string) || "",
+      city: (formData.get("city") as string) || "",
+      state: (formData.get("state") as string) || "",
+      zipCode: (formData.get("zipCode") as string) || "",
+    }
 
-  // Simulate profile update
-  console.log("Updating profile:", { firstName, lastName, email })
+    // Validate the data
+    const validatedData = profileUpdateSchema.parse(data)
 
-  // Simulate delay
-  await new Promise((resolve) => setTimeout(resolve, 1000))
+    // Update demo user data
+    demoUsers.set("demo", {
+      ...validatedData,
+      updated_at: new Date().toISOString(),
+    })
 
-  revalidatePath("/account")
+    revalidatePath("/account")
+
+    return { success: true, message: "Profile updated successfully" }
+  } catch (error) {
+    console.error("Profile update error:", error)
+
+    if (error instanceof z.ZodError) {
+      return {
+        success: false,
+        error: "Validation failed",
+        details: error.errors,
+      }
+    }
+
+    return {
+      success: false,
+      error: "Profile update failed. Please try again.",
+    }
+  }
 }
 
-export async function updateUserSettings(formData: FormData) {
-  const theme = formData.get("theme") as string
-  const emailNotifications = formData.has("emailNotifications")
-  const pushNotifications = formData.has("pushNotifications")
-  const smsNotifications = formData.has("smsNotifications")
+export async function createBudget(formData: FormData) {
+  try {
+    const data = {
+      category: formData.get("category") as string,
+      monthlyLimit: Number.parseFloat(formData.get("monthlyLimit") as string),
+    }
 
-  // Simulate settings update
-  console.log("Updating settings:", { theme, emailNotifications, pushNotifications, smsNotifications })
+    // Simple validation
+    if (!data.category || !data.monthlyLimit || data.monthlyLimit <= 0) {
+      return { success: false, error: "Invalid budget data" }
+    }
 
-  // Simulate delay
-  await new Promise((resolve) => setTimeout(resolve, 1000))
+    // Create demo budget
+    const budget = {
+      id: `budget_${Date.now()}`,
+      user_id: "demo",
+      category: data.category,
+      monthly_limit: data.monthlyLimit,
+      current_spending: 0,
+      percentage_used: 0,
+      created_at: new Date().toISOString(),
+      is_active: true,
+    }
 
-  revalidatePath("/settings")
+    revalidatePath("/analytics")
+
+    return { success: true, budget }
+  } catch (error) {
+    console.error("Budget creation error:", error)
+    return { success: false, error: "Failed to create budget" }
+  }
 }
 
-export async function makeTransaction(formData: FormData) {
-  const fromAccountId = formData.get("fromAccount") as string
-  const toAccount = formData.get("toAccount") as string
-  const recipientName = formData.get("recipientName") as string
-  const amount = Number.parseFloat(formData.get("amount") as string)
-  const description = (formData.get("description") as string) || null
+export async function createGoal(formData: FormData) {
+  try {
+    const data = {
+      title: formData.get("title") as string,
+      description: (formData.get("description") as string) || "",
+      targetAmount: Number.parseFloat(formData.get("targetAmount") as string),
+      targetDate: formData.get("targetDate") as string,
+      category: formData.get("category") as string,
+    }
 
-  // Simulate transaction
-  console.log("Making transaction:", { fromAccountId, toAccount, recipientName, amount, description })
+    // Simple validation
+    if (!data.title || !data.targetAmount || !data.targetDate || !data.category) {
+      return { success: false, error: "Invalid goal data" }
+    }
 
-  // Simulate delay
-  await new Promise((resolve) => setTimeout(resolve, 1000))
+    // Create demo goal
+    const goal = {
+      id: `goal_${Date.now()}`,
+      user_id: "demo",
+      title: data.title,
+      description: data.description,
+      target_amount: data.targetAmount,
+      current_amount: 0,
+      target_date: data.targetDate,
+      category: data.category,
+      is_achieved: false,
+      created_at: new Date().toISOString(),
+    }
 
-  revalidatePath("/dashboard")
-  revalidatePath("/transactions")
+    revalidatePath("/goals")
+
+    return { success: true, goal }
+  } catch (error) {
+    console.error("Goal creation error:", error)
+    return { success: false, error: "Failed to create goal" }
+  }
 }
 
-// Remove all Supabase-related actions
-export async function storeUserCredentials(userData: {
-  userId: string
-  email: string
-  firstName: string
-  lastName: string
-}) {
-  // Demo implementation
-  console.log("Storing user credentials:", userData)
-  return { success: true }
-}
-
-export async function getUserByEmail(email: string) {
-  // Demo implementation
-  console.log("Getting user by email:", email)
-  return { success: true, data: { userId: "demo-user", email } }
+export async function signOut() {
+  // In a real app, this would clear the session
+  redirect("/login")
 }

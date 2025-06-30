@@ -1,74 +1,96 @@
 "use client"
 
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Sparkles, TrendingUp, Clock } from "lucide-react"
-import { useEffect, useState } from "react"
+import type React from "react"
 
-interface WelcomeCardProps {
-  userName?: string
+import { useState, useEffect } from "react"
+import { motion } from "framer-motion"
+import { Sun, Moon, Cloud } from "lucide-react"
+import { Card, CardContent } from "@/components/ui/card"
+
+type WelcomeCardProps = {
+  userName: string
 }
 
-export function WelcomeCard({ userName = "Demo User" }: WelcomeCardProps) {
+export function WelcomeCard({ userName }: WelcomeCardProps) {
   const [currentTime, setCurrentTime] = useState(new Date())
+  const [greeting, setGreeting] = useState("")
+  const [weatherIcon, setWeatherIcon] = useState<React.ReactNode>(null)
 
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date())
-    }, 60000) // Update every minute
+    }, 1000)
 
     return () => clearInterval(timer)
   }, [])
 
-  const hour = currentTime.getHours()
-  const greeting = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening"
-  const timeIcon = hour < 12 ? "🌅" : hour < 18 ? "☀️" : "🌙"
+  useEffect(() => {
+    const hour = currentTime.getHours()
 
-  // Calculate some demo stats
-  const portfolioGrowth = 12.5
-  const pendingTransactions = 3
-  const lastLoginDays = Math.floor(Math.random() * 7) + 1
+    if (hour < 12) {
+      setGreeting("Good morning")
+      setWeatherIcon(<Sun className="h-6 w-6 text-yellow-500" />)
+    } else if (hour < 17) {
+      setGreeting("Good afternoon")
+      setWeatherIcon(<Cloud className="h-6 w-6 text-blue-400" />)
+    } else {
+      setGreeting("Good evening")
+      setWeatherIcon(<Moon className="h-6 w-6 text-purple-400" />)
+    }
+  }, [currentTime])
+
+  const formatTime = (date: Date) => {
+    return date.toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    })
+  }
+
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString("en-US", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    })
+  }
 
   return (
-    <Card className="bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-600 text-white border-0 overflow-hidden relative">
-      <div className="absolute inset-0 bg-black/10" />
-      <CardContent className="p-6 relative z-10">
-        <div className="flex items-start justify-between">
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <Sparkles className="h-5 w-5 animate-pulse" />
-              <Badge variant="secondary" className="bg-white/20 text-white border-0 backdrop-blur-sm">
-                <Clock className="h-3 w-3 mr-1" />
-                {timeIcon} {greeting}
-              </Badge>
+    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+      <Card className="border-0 shadow-lg bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white overflow-hidden">
+        <CardContent className="p-6 relative">
+          <div className="flex items-center justify-between">
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2">
+                {weatherIcon}
+                <h1 className="text-2xl font-bold">
+                  {greeting}, {userName}!
+                </h1>
+              </div>
+              <p className="text-white/80 text-lg">Welcome back to your financial dashboard</p>
+              <div className="flex items-center space-x-4 text-sm text-white/70">
+                <span>{formatDate(currentTime)}</span>
+                <span>•</span>
+                <span className="font-mono">{formatTime(currentTime)}</span>
+              </div>
             </div>
-            <div>
-              <h2 className="text-2xl font-bold mb-1">
-                {greeting}, {userName}!
-              </h2>
-              <p className="text-blue-100">Ready to manage your finances today?</p>
-            </div>
-          </div>
-          <div className="flex items-center justify-center w-14 h-14 bg-white/20 rounded-full backdrop-blur-sm">
-            <TrendingUp className="h-7 w-7" />
-          </div>
-        </div>
 
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-          <div className="flex items-center gap-2 text-blue-100">
-            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-            <span>Portfolio up {portfolioGrowth}% this month</span>
+            <div className="hidden md:block">
+              <div className="text-right space-y-1">
+                <div className="text-sm text-white/70">Quick Stats</div>
+                <div className="text-lg font-semibold">Total Balance</div>
+                <div className="text-2xl font-bold">$18,031.31</div>
+                <div className="text-sm text-green-200">+2.5% this month</div>
+              </div>
+            </div>
           </div>
-          <div className="flex items-center gap-2 text-blue-100">
-            <div className="w-2 h-2 bg-yellow-400 rounded-full" />
-            <span>{pendingTransactions} pending transactions</span>
-          </div>
-          <div className="flex items-center gap-2 text-blue-100">
-            <div className="w-2 h-2 bg-blue-400 rounded-full" />
-            <span>Last login {lastLoginDays} days ago</span>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+
+          {/* Decorative elements */}
+          <div className="absolute -top-4 -right-4 w-24 h-24 bg-white/10 rounded-full blur-xl"></div>
+          <div className="absolute -bottom-8 -left-8 w-32 h-32 bg-white/5 rounded-full blur-2xl"></div>
+        </CardContent>
+      </Card>
+    </motion.div>
   )
 }

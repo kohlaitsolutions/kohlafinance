@@ -1,114 +1,76 @@
-import { getSupabaseServerClient } from "@/lib/supabase/server"
+"use client"
+
 import { SpendingByCategory } from "@/components/analytics/spending-by-category"
 import { MonthlySpending } from "@/components/analytics/monthly-spending"
 import { SpendingTrends } from "@/components/analytics/spending-trends"
 import { TopMerchants } from "@/components/analytics/top-merchants"
 
-export default async function AnalyticsPage() {
-  const supabase = getSupabaseServerClient()
+// Demo transactions for analytics
+const DEMO_TRANSACTIONS = [
+  {
+    id: "demo-tx-1",
+    account_id: "demo-1",
+    transaction_type: "payment",
+    amount: 125.5,
+    description: "Monthly Subscription",
+    recipient_name: "Netflix",
+    recipient_account: "9876543210",
+    status: "completed",
+    category: "entertainment",
+    created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+  {
+    id: "demo-tx-2",
+    account_id: "demo-1",
+    transaction_type: "payment",
+    amount: 45.99,
+    description: "Grocery Shopping",
+    recipient_name: "Whole Foods",
+    recipient_account: "5432109876",
+    status: "completed",
+    category: "groceries",
+    created_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+  {
+    id: "demo-tx-3",
+    account_id: "demo-1",
+    transaction_type: "deposit",
+    amount: 2500.0,
+    description: "Salary Deposit",
+    recipient_name: null,
+    recipient_account: null,
+    status: "completed",
+    category: "income",
+    created_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+  {
+    id: "demo-tx-4",
+    account_id: "demo-1",
+    transaction_type: "payment",
+    amount: 85.0,
+    description: "Electric Bill",
+    recipient_name: "Power Company",
+    recipient_account: "1122334455",
+    status: "completed",
+    category: "utilities",
+    created_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+  {
+    id: "demo-tx-5",
+    account_id: "demo-1",
+    transaction_type: "payment",
+    amount: 35.75,
+    description: "Restaurant",
+    recipient_name: "Local Bistro",
+    recipient_account: "6677889900",
+    status: "completed",
+    category: "dining",
+    created_at: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+]
 
-  // Try to get the session, but don't redirect if it fails
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
-
-  // Use demo data if no session is available
-  let transactions = []
-
-  if (session?.user?.id) {
-    try {
-      // Get user accounts
-      const { data: accounts, error: accountsError } = await supabase
-        .from("accounts")
-        .select("*")
-        .eq("user_id", session.user.id)
-
-      if (!accountsError && accounts && accounts.length > 0) {
-        // Get all transactions
-        const { data: userTransactions, error: transactionsError } = await supabase
-          .from("transactions")
-          .select("*")
-          .in(
-            "account_id",
-            accounts.map((account) => account.id),
-          )
-          .order("created_at", { ascending: false })
-
-        if (!transactionsError && userTransactions) {
-          transactions = userTransactions
-        }
-      }
-    } catch (err) {
-      console.error("Error fetching analytics data:", err)
-      // Continue with demo data
-    }
-  }
-
-  // If no real transactions, use demo data
-  if (transactions.length === 0) {
-    transactions = [
-      {
-        id: "demo-tx-1",
-        account_id: "demo-1",
-        transaction_type: "payment",
-        amount: 125.5,
-        description: "Monthly Subscription",
-        recipient_name: "Netflix",
-        recipient_account: "9876543210",
-        status: "completed",
-        category: "entertainment",
-        created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-      },
-      {
-        id: "demo-tx-2",
-        account_id: "demo-1",
-        transaction_type: "payment",
-        amount: 45.99,
-        description: "Grocery Shopping",
-        recipient_name: "Whole Foods",
-        recipient_account: "5432109876",
-        status: "completed",
-        category: "groceries",
-        created_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-      },
-      {
-        id: "demo-tx-3",
-        account_id: "demo-1",
-        transaction_type: "deposit",
-        amount: 2500.0,
-        description: "Salary Deposit",
-        recipient_name: null,
-        recipient_account: null,
-        status: "completed",
-        category: "income",
-        created_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-      },
-      {
-        id: "demo-tx-4",
-        account_id: "demo-1",
-        transaction_type: "payment",
-        amount: 85.0,
-        description: "Electric Bill",
-        recipient_name: "Power Company",
-        recipient_account: "1122334455",
-        status: "completed",
-        category: "utilities",
-        created_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
-      },
-      {
-        id: "demo-tx-5",
-        account_id: "demo-1",
-        transaction_type: "payment",
-        amount: 35.75,
-        description: "Restaurant",
-        recipient_name: "Local Bistro",
-        recipient_account: "6677889900",
-        status: "completed",
-        category: "dining",
-        created_at: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000).toISOString(),
-      },
-    ]
-  }
+export default function AnalyticsPage() {
+  const transactions = DEMO_TRANSACTIONS
 
   // Process data for spending by category
   const categoryData = processSpendingByCategory(transactions)
@@ -140,8 +102,8 @@ export default async function AnalyticsPage() {
 }
 
 // Helper functions to process transaction data for charts
-function processSpendingByCategory(transactions) {
-  const categories = {}
+function processSpendingByCategory(transactions: any[]) {
+  const categories: Record<string, number> = {}
 
   // Only include payment transactions
   const paymentTransactions = transactions.filter((t) => t.transaction_type === "payment")
@@ -155,7 +117,7 @@ function processSpendingByCategory(transactions) {
   })
 
   // Define colors for each category
-  const categoryColors = {
+  const categoryColors: Record<string, string> = {
     entertainment: "#8884d8",
     groceries: "#82ca9d",
     utilities: "#ffc658",
@@ -172,8 +134,8 @@ function processSpendingByCategory(transactions) {
   }))
 }
 
-function processMonthlySpending(transactions) {
-  const months = {}
+function processMonthlySpending(transactions: any[]) {
+  const months: Record<string, { income: number; expenses: number }> = {}
 
   transactions.forEach((transaction) => {
     const date = new Date(transaction.created_at)
@@ -197,8 +159,8 @@ function processMonthlySpending(transactions) {
   }))
 }
 
-function processSpendingTrends(transactions) {
-  const dailySpending = {}
+function processSpendingTrends(transactions: any[]) {
+  const dailySpending: Record<string, number> = {}
 
   // Only include payment transactions
   const paymentTransactions = transactions.filter((t) => t.transaction_type === "payment")
@@ -221,8 +183,8 @@ function processSpendingTrends(transactions) {
     }))
 }
 
-function processTopMerchants(transactions) {
-  const merchants = {}
+function processTopMerchants(transactions: any[]) {
+  const merchants: Record<string, { amount: number; transactions: number }> = {}
 
   // Only include payment transactions with recipient names
   const paymentTransactions = transactions.filter((t) => t.transaction_type === "payment" && t.recipient_name)

@@ -1,37 +1,53 @@
 import Stripe from "stripe"
 
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+if (!process.env.STRIPE_SECRET_KEY) {
+  throw new Error("STRIPE_SECRET_KEY is not set in environment variables")
+}
+
+export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: "2024-06-20",
   typescript: true,
 })
 
 export const STRIPE_CONFIG = {
-  publishableKey: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!,
-  webhookSecret: process.env.STRIPE_WEBHOOK_SECRET!,
   currency: "usd",
-  paymentMethods: ["card", "apple_pay", "google_pay", "link"],
-}
+  payment_method_types: ["card", "apple_pay", "google_pay"],
+  automatic_payment_methods: {
+    enabled: true,
+  },
+} as const
 
-// Payment method configurations
-export const PAYMENT_METHODS = {
-  card: {
-    name: "Credit/Debit Card",
-    icon: "CreditCard",
-    description: "Visa, Mastercard, American Express",
+export const SUBSCRIPTION_PLANS = {
+  basic: {
+    name: "Basic",
+    price: 0,
+    priceId: null,
+    features: ["Up to 3 accounts", "Basic transaction tracking", "Monthly reports", "Email support"],
   },
-  apple_pay: {
-    name: "Apple Pay",
-    icon: "Smartphone",
-    description: "Pay with Touch ID or Face ID",
+  premium: {
+    name: "Premium",
+    price: 9.99,
+    priceId: process.env.STRIPE_PREMIUM_PRICE_ID,
+    features: [
+      "Unlimited accounts",
+      "Advanced analytics",
+      "Real-time notifications",
+      "Investment tracking",
+      "Priority support",
+      "Export data",
+    ],
   },
-  google_pay: {
-    name: "Google Pay",
-    icon: "Smartphone",
-    description: "Pay with your Google account",
+  enterprise: {
+    name: "Enterprise",
+    price: 29.99,
+    priceId: process.env.STRIPE_ENTERPRISE_PRICE_ID,
+    features: [
+      "Everything in Premium",
+      "Multi-user access",
+      "API access",
+      "Custom integrations",
+      "Dedicated support",
+      "Advanced security",
+    ],
   },
-  link: {
-    name: "Link",
-    icon: "Link",
-    description: "Pay with Link by Stripe",
-  },
-}
+} as const
